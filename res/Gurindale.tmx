@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="SubMaps" value="Road2.tmx"/>
+ </properties>
+ <tileset firstgid="1" name="Tileset" tilewidth="32" tileheight="32">
+  <image source="image.png" width="512" height="512"/>
+  <terraintypes>
+   <terrain name="Grass" tile="78"/>
+   <terrain name="Dark Cobble" tile="172"/>
+   <terrain name="Light Cobble" tile="28"/>
+   <terrain name="Tall Grass" tile="165"/>
+   <terrain name="Rocks" tile="124"/>
+  </terraintypes>
+  <tile id="10" terrain="2,2,2,2"/>
+  <tile id="11" terrain="0,0,0,2"/>
+  <tile id="12" terrain="0,0,2,2"/>
+  <tile id="13" terrain="0,0,2,0"/>
+  <tile id="26" terrain="2,2,2,2"/>
+  <tile id="27" terrain="0,2,0,2"/>
+  <tile id="28" terrain="2,2,2,2"/>
+  <tile id="29" terrain="2,0,2,0"/>
+  <tile id="34" terrain="2,2,2,2"/>
+  <tile id="35" terrain="2,2,2,2"/>
+  <tile id="42" terrain="2,2,2,2"/>
+  <tile id="43" terrain="0,2,0,0"/>
+  <tile id="44" terrain="2,2,0,0"/>
+  <tile id="45" terrain="2,0,0,0"/>
+  <tile id="50" terrain="2,2,2,2"/>
+  <tile id="51" terrain="2,2,2,2"/>
+  <tile id="55" terrain="2,2,2,2"/>
+  <tile id="56" terrain="2,2,2,2"/>
+  <tile id="58" terrain="0,2,2,0"/>
+  <tile id="59" terrain="2,2,2,"/>
+  <tile id="60" terrain="2,2,,"/>
+  <tile id="61" terrain="2,2,,2"/>
+  <tile id="74" terrain="2,0,0,2"/>
+  <tile id="75" terrain="2,,2,"/>
+  <tile id="77" terrain=",2,,2"/>
+  <tile id="78" terrain="0,0,0,0"/>
+  <tile id="79" terrain="0,0,0,0"/>
+  <tile id="90" terrain=",3,3,"/>
+  <tile id="91" terrain="2,,2,2"/>
+  <tile id="92" terrain=",,2,2"/>
+  <tile id="93" terrain=",2,2,2"/>
+  <tile id="94" terrain="0,0,0,0"/>
+  <tile id="95" terrain="0,0,0,0"/>
+  <tile id="106" terrain="3,,,3"/>
+  <tile id="107" terrain="2,2,2,4"/>
+  <tile id="108" terrain="2,2,4,4"/>
+  <tile id="109" terrain="2,2,4,2"/>
+  <tile id="110" terrain="0,2,2,2"/>
+  <tile id="111" terrain="2,0,2,2"/>
+  <tile id="118" terrain=",3,3,3"/>
+  <tile id="119" terrain="3,,3,3"/>
+  <tile id="120" terrain="2,2,2,1"/>
+  <tile id="121" terrain="2,2,1,1"/>
+  <tile id="122" terrain="2,2,1,2"/>
+  <tile id="123" terrain="2,4,2,4"/>
+  <tile id="125" terrain="4,2,4,2"/>
+  <tile id="126" terrain="2,2,0,2"/>
+  <tile id="127" terrain="2,2,2,0"/>
+  <tile id="129" terrain="2,2,2,2"/>
+  <tile id="130" terrain="2,2,2,2"/>
+  <tile id="134" terrain="3,3,,3"/>
+  <tile id="135" terrain="3,3,3,"/>
+  <tile id="136" terrain="2,1,2,1"/>
+  <tile id="137" terrain="1,1,1,1"/>
+  <tile id="138" terrain="1,2,1,2"/>
+  <tile id="139" terrain="2,4,2,2"/>
+  <tile id="140" terrain="4,4,2,2"/>
+  <tile id="141" terrain="4,2,2,2"/>
+  <tile id="142" terrain="0,1,1,1"/>
+  <tile id="143" terrain="1,0,1,1"/>
+  <tile id="145" terrain="2,2,2,2"/>
+  <tile id="146" terrain="2,2,2,2"/>
+  <tile id="148" terrain=",,,3"/>
+  <tile id="149" terrain=",,3,3"/>
+  <tile id="150" terrain=",,3,"/>
+  <tile id="152" terrain="2,1,2,2"/>
+  <tile id="153" terrain="1,1,2,2"/>
+  <tile id="154" terrain="1,2,2,2"/>
+  <tile id="155" terrain="0,0,0,1"/>
+  <tile id="156" terrain="0,0,1,1"/>
+  <tile id="157" terrain="0,0,1,0"/>
+  <tile id="158" terrain="1,1,0,1"/>
+  <tile id="159" terrain="1,1,1,0"/>
+  <tile id="164" terrain=",3,,3"/>
+  <tile id="165" terrain="3,3,3,3"/>
+  <tile id="166" terrain="3,,3,"/>
+  <tile id="169" terrain="2,1,1,1"/>
+  <tile id="170" terrain="1,2,1,1"/>
+  <tile id="171" terrain="0,1,0,1"/>
+  <tile id="172" terrain="1,1,1,1"/>
+  <tile id="173" terrain="1,0,1,0"/>
+  <tile id="180" terrain=",3,,"/>
+  <tile id="181" terrain="3,3,,"/>
+  <tile id="182" terrain="3,,,"/>
+  <tile id="183" terrain="4,4,4,4"/>
+  <tile id="184" terrain="4,4,4,4"/>
+  <tile id="185" terrain="1,1,2,1"/>
+  <tile id="186" terrain="1,1,1,2"/>
+  <tile id="187" terrain="0,1,0,0"/>
+  <tile id="188" terrain="1,1,0,0"/>
+  <tile id="189" terrain="1,0,0,0"/>
+  <tile id="199" terrain="4,4,4,4"/>
+  <tile id="200" terrain="4,4,4,4"/>
+  <tile id="219">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="221">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="236">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="237">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="245">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="247">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="248">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="249">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="250">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="251">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="252">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+  <tile id="253">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Bottom" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   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
+  </data>
+ </layer>
+ <layer name="Middle" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   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
+  </data>
+ </layer>
+ <layer name="Top" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJztnclu3DAMhv3+79UW6JJb9ya37khv3YGi8kGAhiBpUqOFtPgBAia2Y2tEDvWT0iTbFuw8T+1Fai+Z4w9Se5jao9S+pPYVuaY8jt23vMeb1N4iv+ORx6k9aXBN5n1qH1L7uF2OWXm8HNs/qf1Ffrc8Ds9tG247+Dseyb517TWZ76n9SO3ndjlm5XHKZuU128E5znaekXzGa+MA9OkMZTMIdu5Vaq833naekfhWrf/BMduBsQ/arDxfnsvHP6X2GXkWZ9fV4eYbGPugzcrz5bl8/Fdqv5FnUJ/FgJ9vytiXYw91njt+ZFevtNZXO9x8U8Y+LPZQsREex56B2dcbrfXVjnS+ybGHg/KF8hnZDtTc4ome+koDpY8kvpDtILGvdXrqKw2UPpL4whnsYA1KH3nK9Y5yIE850hn00VEOJMmReuir3ljyMyp/3YH9lORIPfRVbyzl4lT+ugP7KYkBVvSVBku5ODc2Nf20oq80WJpryrGB8ansp6UYuwqaWnXYpz9cfOLW00o86isNI/2Qi0/celqJR32lAfNDykZa23HXH2lAag70qK80YH4o2XMBwcYeXs/lIhBJnZTCmr7SgPkhNVbcGGK2gtdzuQi0p+eY0xoqVnA6GrMVvJ6LI9CenmOOBShblX7PxRFoT88xpwW9dJZUL4zeD6NZK70pXj/t0BeMXjUvjV4Y0Z+MZq30rnj9rkNfMHrVvKR6YfR+GOtrdCNrXtizLO+HKWPUDXmVXWpiv2U9VcaoO/KqtrScP2ti/+p6CqIdQ85+0tjfW0O1uv8t8bon2Bhq6k/lfCzVrr01FHX/I836Dfx8T7zGrm0FNn9y48XVQiDUfXp/jqj7H2nWf4pnaK69Fm68NLUQyfcqOGo/R6002ox4hSH5PkQmz8fY+WvHpUdc03zmuHg1Cmrcj+quPeqy2txQsj5oaQ+OBGpcj/KEHnmE1h4Sn7C0B0cCNa5HeUKPPEIb7yQ+YSn/l+A5P7Oc64/A2n4Oz77UglhbtcXq8cEaq8aH2EM5F7jG6y2HORtwjXdmDmNNQ80ArvHOzGFCQ80DWx+gNJTH9WRvYOsDlIYatZ4c8GtfvdbFAhpu7WvkuthMZucYmI7KfcL6dXbdNTvHwHRU7hPWr7PrrtnrJJiOyn3C+nX22tXsdRJMR+U+Yf3yVruCWt7T3wQ7o76CWt7T3wTzrq8kvm99nzuFRx3lyfc5sBoIpaNGfV+oBq++D8FqIJSOGvV9oeASKzrqdpu7ZzO45H6bt2czCIIgCIIgWBdPddIVoGpFtXWvsO91ULUirO4lGeuz1AJrkfhxjc9idS/JWJ+lFliL5v+IaMDqXquPtYQV/4+I5TUdK/XbkZx9b4w3zr43ZhSttHDPmNAiFnrR/B60cE0shDb08D53POiKmlgIbejhfXqhJhbGfGYLbxrXcr6wIlbyhWeDnmPd/1aLr1b8j8KTPVr4tvX362m+a+Hbnt6vdWp920tOnvHS31rf9pKTZ1r216J+8ZaTt+yvdf2yGtb1S2usx3rr+qX1+Hmbm6zRevy8zU3WiPELgiAIjvgPCL1ObA==
+  </data>
+ </layer>
+ <objectgroup color="#ffff00" name="Object Layer">
+  <object name="Cave1" type="Teleport" x="589" y="577" width="95" height="75">
+   <properties>
+    <property name="destination" value="Cave2"/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="0" y="584" width="593" height="57">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Cave2" type="Teleport" x="468" y="435" width="86" height="74">
+   <properties>
+    <property name="destination" value="Cave1"/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="549" y="439" width="199" height="53">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="338" y="440" width="135" height="58">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="339" y="402" width="411" height="28">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="681" y="586" width="138" height="56">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="767" y="292" width="49" height="289">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="821" y="294" width="503" height="56">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1274" y="2" width="49" height="289">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="701" y="184" width="47" height="230">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="340" y="183" width="47" height="231">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="391" y="181" width="307" height="24">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="0" y="571" width="762" height="7">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1" y="3" width="4" height="560">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1" y="644" width="3" height="2553">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="3193" y="6" width="5" height="3191">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="8" y="1" width="3193" height="4">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="3" y="3192" width="3193" height="4">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2188" y="1151" width="160" height="57">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2574" y="1154" width="160" height="57">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2194" y="609" width="21" height="539">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2707" y="607" width="23" height="546">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2579" y="798" width="18" height="353">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2328" y="796" width="18" height="353">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2374" y="735" width="182" height="60">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2350" y="767" width="19" height="57">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2558" y="769" width="19" height="57">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2220" y="596" width="484" height="33">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2446" y="877" width="38" height="48">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="94" y="742" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="256" y="774" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="160" y="936" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="159" y="1096" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="318" y="1160" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="444" y="777" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="672" y="806" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="545" y="1128" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="768" y="1064" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="893" y="1159" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="863" y="903" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="833" y="777" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1088" y="1122" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1024" y="935" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1055" y="742" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="957" y="648" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="959" y="486" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1087" y="548" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1214" y="488" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1183" y="649" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1181" y="839" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1312" y="677" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1312" y="934" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1409" y="1257" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1856" y="1127" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2620" y="1514" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2400" y="1767" width="36" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Cave3" type="Teleport" x="1167" y="2845" width="95" height="75">
+   <properties>
+    <property name="destination" value="Cave4"/>
+   </properties>
+  </object>
+  <object name="Cave4" type="Teleport" x="398" y="2742" width="105" height="79">
+   <properties>
+    <property name="destination" value="Cave3"/>
+   </properties>
+  </object>
+  <object name="Cave5" type="Teleport" x="1229" y="2646" width="99" height="78">
+   <properties>
+    <property name="destination" value="Cave6"/>
+   </properties>
+  </object>
+  <object name="Cave6" type="Teleport" x="2412" y="2646" width="102" height="77">
+   <properties>
+    <property name="destination" value="Cave5"/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="303" y="3012" width="455" height="57">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="976" y="2858" width="193" height="52">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1261" y="2857" width="169" height="54">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="303" y="2446" width="1111" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="303" y="2473" width="24" height="538">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1398" y="2472" width="29" height="383">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="729" y="2627" width="29" height="383">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="759" y="2629" width="215" height="54">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="976" y="2627" width="29" height="231">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2284" y="2824" width="360" height="54">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2310" y="2481" width="316" height="27">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2287" y="2497" width="29" height="329">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2617" y="2495" width="29" height="329">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1195" y="2510" width="35" height="209">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1331" y="2511" width="35" height="209">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="362" y="2607" width="35" height="209">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="503" y="2605" width="60" height="210">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="398" y="2603" width="129" height="26">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1232" y="2510" width="99" height="27">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2380" y="2553" width="35" height="163">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2517" y="2554" width="35" height="163">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2420" y="2542" width="92" height="28">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="397" y="2731" width="103" height="8">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1231" y="2636" width="100" height="8">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="2413" y="2635" width="100" height="8">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Collission" type="Collission" x="1006" y="2833" width="390" height="6">
+   <properties>
+    <property name="blocked" value=""/>
+   </properties>
+  </object>
+  <object name="Spawn" type="Spawn" x="1580" y="31" width="138" height="105">
+   <properties>
+    <property name="spawn" value=""/>
+   </properties>
+  </object>
+  <object name="Altar Message" type="Message" x="2440" y="867" width="48" height="64">
+   <properties>
+    <property name="message" value="Diligently readest these words! Thou must needs traverse the caverns yonder in the south-west. Thy journey shalt be long and most demanding, but thou wilt be well rewarded for thy troubles. Bring the sacred heirloom that was stolen from here and the true path shalt reveal itself."/>
+   </properties>
+  </object>
+  <object name="Heirloom Message" type="Message" x="2519" y="2682" width="34" height="35">
+   <properties>
+    <property name="message" value="I found a diamond ring from here. Methinks it may be worth a fortune. Whatever, I'm having it checked out by the cave troll in the north-west. I have to be careful lest I repeat the same mistake I did last time and forget to take this letter with me. I'll never forgive that scoundrel who tracked me down and stole my last treasure...&lt;br /&gt;&lt;br /&gt;- &amp;quot;Locke&amp;quot; "/>
+   </properties>
+  </object>
+  <object name="Fireplace Message" type="Message" x="933" y="102" width="54" height="64">
+   <properties>
+    <property name="message" value="An awful smell stems from the fire. Looking for clues, thou decidest to take a closer look and spot fresh blood and what seemeth like burnt flesh on the timber. Someone has carved writing on the firewood./n/n.&quot;Cursed be Locke! He hath surpised me and strapped me onto the fire. If only I had accepted his meager pay for my services I would never have ended up here... Mayhap it be that some craving adventurer wilt find this text. Thou shoult know that I have hidden enourmous riches that may be of interest to thee. Howsoever, the location of this treasure can only be discovered by reading the inscription on the stones beneath using the Rosetta stone. The Rosetta stone was, alas, stolen by Locke. Bring Locke to justice and you may have whatever you can find from my camp. He was headed west toward Sylia when he left me for dead...&quot;/n/nTHE END!"/>
+   </properties>
+  </object>
+  <object name="Hidden Message" type="Message" x="385" y="1775" width="57" height="51">
+   <properties>
+    <property name="message" value="These are not the droids you are looking for."/>
+   </properties>
+  </object>
+  <object name="Grave Message" type="Message" x="384" y="1310" width="63" height="34">
+   <properties>
+    <property name="message" value="Death is when the monsters get you."/>
+   </properties>
+  </object>
+  <object name="Warning1 Message" type="Message" x="1118" y="2916" width="36" height="55">
+   <properties>
+    <property name="message" value="Thou be warned, monsters dwell in this cave!"/>
+   </properties>
+  </object>
+  <object name="Warning2 Message" type="Message" x="1279" y="2917" width="35" height="52">
+   <properties>
+    <property name="message" value="Thou be warned, monsters dwell in this cave!"/>
+   </properties>
+  </object>
+  <object name="Signpost Message" type="Message" x="1470" y="1993" width="67" height="51">
+   <properties>
+    <property name="message" value="West to Syliva\nEast to Gurindale Docks\nSouth to Gurindale Village\nNorth to Foggy Cliffs\nP.S. Stop by the inn on your way to Gurindale Village for refreshments!"/>
+   </properties>
+  </object>
+  <object name="Flower Message" type="Message" x="3008" y="1826" width="31" height="30">
+   <properties>
+    <property name="message" value="What? It's just an ordinary flowerbed. Flowerbeds don't talk! ...Oh and there's no treasure either."/>
+   </properties>
+  </object>
+  <object name="randomkukka" gid="168" x="1696" y="2176">
+   <properties>
+    <property name="blocked" value=""/>
+    <property name="message" value="Olen Mr kukka!"/>
+   </properties>
+  </object>
+  <object name="Exit to Road2" type="Exit" x="0" y="2144" width="64" height="192">
+   <properties>
+    <property name="exit" value="Road2.tmx"/>
+    <property name="location" value="Exit to Gurindale"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

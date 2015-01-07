@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="Tiles" tilewidth="32" tileheight="32">
+  <image source="image.png" width="512" height="512"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzzZ2Bg8MeDdwDxTgJqaIlHsv0wuwfa/pMjMOxH7R+1f9T+UftH7R+1f9T+UftHmv2jbc/RuB9o+0fjnvYYAP2CWRw=
+  </data>
+ </layer>
+ <layer name="Tile Layer 2" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzt07kNgDAMheHsvxcwAdcAXA0dV4N4C1iRElsG9D7pr6wkhZUQ0nWozzifa0aL4/snuhTuKVCJKoW7UtSoQa0wt97zgEY0CXPrPW9oR4cw19ozfd/b/6q12F+1FvurRET0D6vz+7fz+0SWHirQIaM=
+  </data>
+ </layer>
+ <objectgroup name="Object Layer">
+  <object name="Spawn" type="Spawn" x="128" y="896" width="160" height="128"/>
+  <object name="Exit" type="Exit" x="192" y="32" width="192" height="128">
+   <properties>
+    <property name="exit" value="untitled.tmx"/>
+    <property name="location" value="Exit"/>
+   </properties>
+  </object>
+  <object name="Creep1" type="Entity" x="512" y="416" width="32" height="32">
+   <properties>
+    <property name="automove" value=""/>
+   </properties>
+  </object>
+  <object name="Creep2" type="Entity" x="512" y="576" width="32" height="32">
+   <properties>
+    <property name="automove" value=""/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
