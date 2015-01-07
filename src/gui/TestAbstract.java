@@ -14,7 +14,7 @@ public abstract class TestAbstract<E> {
 
 	protected InfoFrame<E> infoFrame;
 
-	boolean commandParsed = false;
+	protected boolean commandParsed = false;
 	
 	//Controlling logic loop speed
 	int sleepTime = 500;

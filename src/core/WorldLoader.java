@@ -3,6 +3,7 @@ package core;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import components.Health;
+import components.Name;
 import components.Position;
 import tiled.core.Map;
 import tiled.core.MapLayer;
@@ -137,12 +138,14 @@ public class WorldLoader {
 		System.out.println();
 
 		Entity newEntity = new Entity();
+		newEntity.add(new Name(obj.getName()));
 		newEntity.add(new Position(obj.getX(), obj.getY()));
 
 		if(entityProperties.containsKey("health")){
 			int health = Integer.parseInt(entityProperties.getProperty("health"));
 			newEntity.add(new Health(health));
 		}
+
 
 		engine.addEntity(newEntity);
 	}
