@@ -2,7 +2,9 @@ package network;
 
 import java.util.Vector;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
 
@@ -17,9 +19,19 @@ public class Network {
         kryo.register(SyncEntities.class);
         kryo.register(Spawn.class);
         kryo.register(Vector.class);
-        kryo.register(Entity.class);
         kryo.register(MoveTo.class);
         kryo.register(GoToMap.class);
+
+		kryo.register(com.badlogic.ashley.core.Component[].class);
+		kryo.register(Component.class);
+		kryo.register(com.badlogic.gdx.utils.Array.class);
+		kryo.register(Object[].class);
+		kryo.register(components.Name.class);
+		kryo.register(components.MapName.class);
+		kryo.register(components.Position.class);
+		kryo.register(components.Velocity.class);
+		kryo.register(components.Health.class);
+
     }
 	
 	static public class Message{
@@ -27,16 +39,16 @@ public class Network {
 	}
 	
 	static public class SyncEntities{
-		public Vector<Entity> entities;
+		public Vector<Component[]> entities;
 	}
 	
 	static public class MoveTo{
-		int x;
-		int y;
+		public int x;
+		public int y;
 	}
 	
 	static public class GoToMap{
-		String mapName;
+		public String mapName;
 	}
 	
 	static public class Spawn{

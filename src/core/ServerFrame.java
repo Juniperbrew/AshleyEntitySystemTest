@@ -1,19 +1,17 @@
 package core;
 
-import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -26,10 +24,9 @@ import network.Network.Message;
 import network.Network.SyncEntities;
 import network.Network.Spawn;
 import network.Network.GoToMap;
-import network.Network.MoveTo;
 import systems.AIRandomMovementSystem;
 
-public class ServerFrame extends TestAbstract<String> implements EntityListener {
+public class ServerFrame extends TestAbstract<String>{
 
 	Server server;
 
@@ -47,7 +44,7 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 	HashMap<Connection,Entity> playerList;
 
 	//Key is mapname, value is vector containing all entities in that map
-	HashMap<String,Vector<Entity>> entities;
+	//HashMap<String,Vector<Entity>> entities;
 
 	public ServerFrame(){
 		super();
@@ -92,13 +89,15 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 						}
 
 						if(request.text.equalsIgnoreCase("sync")){
+
 							SyncEntities sync = new SyncEntities();
-							//Vector<Entity> entitiesInPlayersMap = Mappers.entities.get(playerList.get(connection));
-							sync.entities = worldData.entities;
+							sync.entities = createSyncPacket(connection);
+
 							connection.sendTCP(sync);
 							infoFrame.addLogLine("Sent server status");
 						}
 					}else if (object instanceof Spawn) {
+						infoFrame.addLogLine("Spawn");
 						Spawn spawn = (Spawn) object;
 						connection.setName(spawn.name);
 						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
@@ -109,30 +108,34 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 						newPlayer.add(new Position(322,322));
 						worldData.engine.addEntity(newPlayer);
 
-						/*addEntity(spawn.mapName, newPlayer);*/
-
 						playerList.put(connection, newPlayer);
 					}else if (object instanceof GoToMap) {
+						infoFrame.addLogLine("GoToMap");
 						GoToMap goToMap = (GoToMap) object;
 						Entity player = playerList.get(connection);
+						if(player == null){
+							infoFrame.addLogLine(connection + " is trying to change map without owning an entity");
+							return;
+						}
+						MapName mapComponent = Mappers.mapM.get(player);
+
+						infoFrame.addLogLine("Moving player " + Mappers.nameM.get(player).name + " to " + goToMap.mapName);
 
 						//First remove player from old map
-						//entities.get(player.map).remove(player);
+						worldData.entitiesInMap.get(mapComponent.map).remove(player);
 
 						//Make sure the entity knows what map it is in
-						//player.map = goToMap.mapName;
+						mapComponent.map = goToMap.mapName;
 
 						//Finally add the player to the maps entity list
 						//If player moves to a map with no entities we create a new entity list for that map
-						/*if(entities.get(player.map) == null){
+						if(worldData.entitiesInMap.get(mapComponent.map) == null){
 							Vector<Entity> entitiesInMap = new Vector<Entity>();
 							entitiesInMap.add(player);
-							entities.put(player.map, entitiesInMap);
+							worldData.entitiesInMap.put(mapComponent.map, entitiesInMap);
 						}else{
-							entities.get(player.map).add(player);
-						}*/
-
-						//infoFrame.addLogLine("Moving player " + player.name + " to " + goToMap.mapName);
+							worldData.entitiesInMap.get(mapComponent.map).add(player);
+						}
 					}
 				}
 			});
@@ -175,15 +178,14 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("autosync command needs 1 argument");
 				}
-			}else if(command.equals("add")){/*
+			}else if(command.equals("add")){
 				commandParsed = true;
 				try{
 					Entity newEntity = new Entity();
-					newEntity.name = scn.next();
-					newEntity.map = scn.next();
-					newEntity.x = scn.nextFloat();
-					newEntity.y = scn.nextFloat();
-					addEntity(newEntity.map, newEntity);
+					newEntity.add(new Name(scn.next()));
+					newEntity.add(new MapName((scn.next())));
+					newEntity.add(new Position(scn.nextFloat(),scn.nextFloat()));
+					worldData.engine.addEntity(newEntity);
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("argument 3 and 4 need to be floats");
 				}catch(NoSuchElementException e){
@@ -197,8 +199,15 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 					if(scn.hasNext()){
 						mapName = scn.next();
 					}
+					Name nameComponent = new Name("Bulk");
+					MapName mapNameComponent = new MapName(mapName);
+					Position positionComponent = new Position(0,0);
 					for(int i = 0; i<amount;i++){
-						addEntity(mapName, new Entity("Bulk",mapName,0,0,true));
+						Entity newEntity = new Entity();
+						newEntity.add(nameComponent);
+						newEntity.add(mapNameComponent);
+						newEntity.add(positionComponent);
+						worldData.engine.addEntity(newEntity);
 					}
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("first argument needs to be an integer, second a String");
@@ -215,11 +224,9 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("loadworld command needs 1 argument (untitled.tmx)");
 				}
-			}else if(command.equals("clear")){
+			}else if(command.equals("clear")) {
 				commandParsed = true;
 				clearEntities();
-				infoFrame.addLogLine("Entities cleared");
-				*/
 			}else{
 				if(commandParsed){
 					commandParsed = false;
@@ -230,77 +237,70 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 			scn.close();
 		}
 	}
-/*
-	private void addEntity( String map,Entity entity){
-		Vector<Entity> entitiesInMap = entities.get(map);
-		if(entitiesInMap == null){
-			entitiesInMap = new Vector<Entity>();
-			entitiesInMap.add(entity);
-			entities.put(map, entitiesInMap);
-		}else{
-			entitiesInMap.add(entity);
-		}
-		infoFrame.addListItem(entity);
-		infoFrame.addLogLine("Added entity " + entity.name + " to map " + map);
-	}
-
-	private void setEntities(HashMap<String,Vector<Entity>> newEntities){
-		entities = newEntities;
-		infoFrame.clearList();
-		for(Vector<Entity> entitiesInMap : entities.values()){
-			for(Entity entity : entitiesInMap){
-				infoFrame.addListItem(entity);
-				infoFrame.addLogLine("Added entity " + entity.name + " to map " + entity.map);
-			}
-		}
-	}
-*/
 
 	private void clearEntities(){
-		entities.clear();
+		//Remove entities from worldData
+		if(worldData != null)
+		worldData.engine.removeAllEntities();
+
+		//Empty list mapping connections to player entities
+		playerList.clear();
+
+		//Send all clients an empty sync update
+		SyncEntities sync = new SyncEntities();
+		sync.entities = new Vector<Component[]>();
+		server.sendToAllTCP(sync);
+
+		infoFrame.addLogLine("Entities cleared");
+	}
+
+	private Vector<Component[]> createSyncPacket(Connection connection){
+		Entity player = playerList.get(connection);
+		Vector<Entity> entitiesInPlayersMap = worldData.getEntitiesInMap(Mappers.mapM.get(player).map);
+		Vector<Component[]> entitiesAsComponents = new Vector<>();
+
+		for(Entity e : entitiesInPlayersMap){
+			ImmutableArray<Component> components = e.getComponents();
+			Component[] componentsArray = components.toArray(Component.class);
+			entitiesAsComponents.add(componentsArray);
+		}
+		return entitiesAsComponents;
 	}
 
 	@Override
 	protected void doLogic() {
 
-		/*
 		//Auto sync clients	
 		if(autoSync){
 			for(Connection connection : playerList.keySet()){
-				Entity player = playerList.get(connection);
-				Vector<Entity> entitiesInPlayersMap = entities.get(player.map);
 				SyncEntities sync = new SyncEntities();
-				sync.entities = entitiesInPlayersMap;
+				sync.entities = createSyncPacket(connection);
 				connection.sendTCP(sync);
-				//infoFrame.addLogLine("Sent entity status to " + player.name);
+				//infoFrame.addLogLine("Sent entity status to " + Mappers.nameM.get(playerList.get(connection)).name);
 			}
 
 			syncsSent++;
 			syncsSentPerSecondCounter++;
 		}
-*/
 		worldData.engine.update(1);
 		infoFrame.setListItems(worldData.getEntitiesAsString());
 
 		//infoFrame.repaint();
 		updateSpecificInfo();
 	}
-	
-	private void removePlayers(){
-		playerList.clear();
-		SyncEntities sync = new SyncEntities();
-		sync.entities = new Vector<Entity>();
-		server.sendToAllTCP(sync);
+
+	private void loadWorld(String mapName){
+
+		clearEntities();
+		worldData = WorldLoader.loadWorld(mapName);
+		worldData.engine.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
 	}
 
 	@Override
 	protected void initialize() {
 		startServer();
 		playerList = new HashMap<Connection,Entity>();
-		entities = new HashMap<String,Vector<Entity>>();
-
-		worldData = WorldLoader.loadWorld("untitled.tmx");
-		worldData.engine.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
+		loadWorld("untitled.tmx");
 	}
 
 	public static void main(String[] args){
@@ -311,16 +311,6 @@ public class ServerFrame extends TestAbstract<String> implements EntityListener 
 	protected void oneSecondElapsed() {
 		syncsSentPerSecond = syncsSentPerSecondCounter;
 		syncsSentPerSecondCounter = 0;
-	}
-
-	@Override
-	public void entityAdded(Entity entity) {
-
-	}
-
-	@Override
-	public void entityRemoved(Entity entity) {
-
 	}
 }
 

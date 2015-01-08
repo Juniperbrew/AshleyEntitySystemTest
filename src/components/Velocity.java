@@ -9,4 +9,7 @@ public class Velocity extends Component {
         this.vectorX = vectorX;
         this.vectorY = vectorY;
     }
+
+    public Velocity() {
+    }
 }

@@ -11,6 +11,9 @@ public class Position extends Component {
         this.y = y;
     }
 
+    public Position() {
+    }
+
     public void set(float x, float y) {
         this.x = x;
         this.y = y;

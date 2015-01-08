@@ -11,4 +11,7 @@ public class MapName extends Component {
     public MapName(String map) {
         this.map = map;
     }
+
+    public MapName() {
+    }
 }

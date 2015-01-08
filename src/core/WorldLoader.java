@@ -3,6 +3,7 @@ package core;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import components.Health;
+import components.MapName;
 import components.Name;
 import components.Position;
 import tiled.core.Map;
@@ -139,6 +140,7 @@ public class WorldLoader {
 
 		Entity newEntity = new Entity();
 		newEntity.add(new Name(obj.getName()));
+		newEntity.add(new MapName(mapName));
 		newEntity.add(new Position(obj.getX(), obj.getY()));
 
 		if(entityProperties.containsKey("health")){
@@ -160,7 +162,6 @@ public class WorldLoader {
 		try {
 			tiledMap = mapReader.readMap(resFolderPath + mapName);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

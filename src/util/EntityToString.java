@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.utils.ImmutableArray;
 import components.Health;
+import components.MapName;
 import components.Name;
 import components.Position;
 
@@ -24,7 +25,10 @@ public class EntityToString {
             } else if (component instanceof Name) {
                 Name name = (Name) component;
                 entityString.append("Name: " + name.name + " ");
-            } else {
+            } else if (component instanceof MapName) {
+                MapName mapName = (MapName) component;
+                entityString.append("Map: " + mapName.map + " ");
+            }else {
                 entityString.append(component.getClass() + " ");
             }
         }

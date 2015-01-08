@@ -25,7 +25,6 @@ public class AIRandomMovementSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        System.out.println("Moving randomly");
         Position position = Mappers.positionM.get(entity);
 
         position.x += ((rng.nextFloat()*5)-2.5f)*deltaTime;
