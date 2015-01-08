@@ -41,8 +41,8 @@ public class ClientFrame extends TestAbstract<String>{
 	}
 
 	private void updateSpecificInfo(){
-
-		infoFrame.setSpecificInfoText("Syncs received: " + syncsReceived + " Syncs/s: " + syncsReceivedPerSecond
+		int entityCount = worldData.getEntityCount();
+		infoFrame.setSpecificInfoText("Entities: " + entityCount + " Syncs received: " + syncsReceived + " Syncs/s: " + syncsReceivedPerSecond
 				+ " Buffer: " + client.getTcpWriteBufferSize() + "B/" + writeBufferSize + "B Ping: " + client.getReturnTripTime() + "ms");
 	}
 

@@ -28,6 +28,10 @@ public class WorldData implements EntityListener {
         engine.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
     }
 
+    public int getEntityCount(){
+        return entityIDs.size();
+    }
+
     public Vector<Entity> getEntitiesInMap(String mapName){
         return entitiesInMaps.get(mapName);
     }

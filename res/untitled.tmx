@@ -159,9 +159,10 @@
     <property name="destination" value="Cave2"/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="0" y="584" width="593" height="57">
+  <object name="Collision" type="Collision" x="0" y="584" width="593" height="57">
    <properties>
     <property name="blocked" value=""/>
+    <property name="the one and only collision" value=""/>
    </properties>
   </object>
   <object name="Cave2" type="Teleport" x="469" y="438" width="90" height="71">

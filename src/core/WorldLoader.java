@@ -125,7 +125,7 @@ public class WorldLoader {
 		System.out.println("Spawn count: " + spawnCount);
 		System.out.println("Exit count: " + exitCount);
 		System.out.println("Objects without type: " + noTypeCount);
-		System.out.println("Supported objects: " + (collisionCount+entityCount+messageCount+teleportCount+spawnCount+exitCount+noTypeCount));
+		System.out.println("Unsupported objects: " + (objectCount-(collisionCount+entityCount+messageCount+teleportCount+spawnCount+exitCount+noTypeCount)));
 		System.out.println("Total object count: " + objectCount);
 		System.out.println();
 	}

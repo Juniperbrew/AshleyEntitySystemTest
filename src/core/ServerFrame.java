@@ -57,7 +57,8 @@ public class ServerFrame extends TestAbstract<String>{
 	}
 
 	private void updateSpecificInfo(){
-		StringBuilder info = new StringBuilder("Syncs sent: " + syncsSent + " Syncs/s: " + syncsSentPerSecond);
+		int entityCount = worldData.getEntityCount();
+		StringBuilder info = new StringBuilder("Entities: " + entityCount + " Syncs sent: " + syncsSent + " Syncs/s: " + syncsSentPerSecond);
 		Connection[] connections = server.getConnections();
 		for(Connection connection : connections){
 			info.append(" " + connection + ": " + connection.getTcpWriteBufferSize() + "B/" + writeBufferSize + "B " + connection.getReturnTripTime() + "ms ");
