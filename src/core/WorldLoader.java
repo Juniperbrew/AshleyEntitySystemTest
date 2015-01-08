@@ -11,6 +11,7 @@ import tiled.core.MapObject;
 import tiled.core.ObjectGroup;
 import tiled.io.TMXMapReader;
 
+import java.io.File;
 import java.util.*;
 
 public class WorldLoader {
@@ -20,7 +21,7 @@ public class WorldLoader {
 	}
 
 	public static WorldData loadWorld(String startingMapName){
-		String resFolderPath = (System.getProperty("user.dir") + "\\res\\");
+		String resFolderPath = (System.getProperty("user.dir") + File.separator + "res" + File.separator);
 
 		HashMap<String,Map> allMaps = new HashMap<String,Map>();
 		Engine engine = new Engine();
