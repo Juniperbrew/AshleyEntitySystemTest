@@ -95,20 +95,25 @@ public class WorldData implements EntityListener {
         }
 
         //Remove all entities not sent in update
-        //Use iterator to avoid ConcurrentModificationException
-        Iterator<Long> iter = entityIDs.iterator();
-        while(iter.hasNext()){
-            long id = iter.next();
-            //FIXME happens on client java.util.ConcurrentModificationException at java.util.Vector$Itr.checkForComodification
-            if(updateIDList.contains(id)){
+        //Copy id list to avoid ConcurrentModificationException caused by calls to entityRemoved(Entity e)
+        //FIXME is this a good idea
+        Vector<Long> idListCopy = new Vector<>();
+        for(long id : entityIDs){
+            idListCopy.add(id);
+        }
+
+        for(long id : idListCopy){
+            if (updateIDList.contains(id)) {
                 //This entity was sent in update
-            }else{
-                iter.remove();
+            } else {
+                //We dont need to remove ID here since it's removed in the call to listeners entityRemoved()
+                //iter.remove();
                 engine.removeEntity(getEntityWithID(id));
 
                 System.out.println("Removed one entity from local list, this should never happen on server");
             }
         }
+
     }
 
     protected void createEntity(String mapName, MapObject obj){
@@ -167,8 +172,6 @@ public class WorldData implements EntityListener {
         }else{
             entitiesInMaps.get(map).add(entity);
         }
-		//entities.add(entity);
-		//entitiesAsString.add(EntityToString.convert(entity));
     }
 
 	@Override
@@ -182,7 +185,5 @@ public class WorldData implements EntityListener {
         }else{
             entitiesInMaps.get(map).remove(entity);
         }
-		//entities.remove(entity);
-		//entitiesAsString.remove(EntityToString.convert(entity));
 	}
 }

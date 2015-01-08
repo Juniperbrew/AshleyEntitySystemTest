@@ -74,26 +74,6 @@ public class ClientFrame extends TestAbstract<String>{
 							}
 						});
 
-
-						/*
-						SwingUtilities.invokeLater(new Runnable() {
-
-							@Override
-							public void run() {
-								//FIXME Find a better way to sync entities than clearing them all and adding them back
-								worldData.engine.removeAllEntities();
-								for(Component[] components : status.entities){
-									Entity e = new Entity();
-									for(Component component : components){
-										e.add(component);
-									}
-									worldData.engine.addEntity(e);
-								}
-
-							}
-
-						});
-						*/
 						syncsReceived++;
 						syncsReceivedPerSecondCounter++;
 					}
