@@ -11,17 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 @SuppressWarnings("serial")
@@ -40,6 +30,8 @@ final public class InfoFrame<E> extends JFrame{
 	private JTextArea info;
 	private JScrollPane exceptionsScroll;
 	private JTextArea exceptions;
+	private JScrollPane consoleScroll;
+	private JTextArea console;
 	private JScrollPane infoScroll;
 	private JTabbedPane textTabs;
 	
@@ -84,6 +76,11 @@ final public class InfoFrame<E> extends JFrame{
 		exceptions.setText("Exceptions ^.^");
 		exceptions.setEditable(false);
 		exceptionsScroll = new JScrollPane(exceptions);
+
+		console = new JTextArea();
+		console.setText("Console ^.^\n");
+		console.setEditable(false);
+		consoleScroll = new JScrollPane(console);
 		
 		textTabs = new JTabbedPane();
 		textTabs.setPreferredSize(new Dimension(0,250));
@@ -91,6 +88,7 @@ final public class InfoFrame<E> extends JFrame{
 		textTabs.addTab("MinLog", debugScroll);
 		textTabs.addTab("Info", infoScroll);
 		textTabs.addTab("Exceptions", exceptionsScroll);
+		textTabs.addTab("Console", consoleScroll);
 		
 		GridBagLayout gridBag = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
@@ -182,6 +180,16 @@ final public class InfoFrame<E> extends JFrame{
 		exceptions.append("\n" + line);
 		exceptions.setCaretPosition(exceptions.getDocument().getLength());
 		exceptionsScroll.getHorizontalScrollBar().setValue(exceptionsScroll.getHorizontalScrollBar().getMinimum());
+	}
+
+	public void updateConsole(final String text){
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				console.append(text);
+				console.setCaretPosition(console.getDocument().getLength());
+				consoleScroll.getHorizontalScrollBar().setValue(consoleScroll.getHorizontalScrollBar().getMinimum());
+			}
+		});
 	}
 	
 	public void setCommandListener(final Runnable listener){
