@@ -17,6 +17,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import components.MapName;
 import components.Name;
+import components.NetworkID;
 import components.Position;
 import gui.TestAbstract;
 import network.Network;
@@ -25,6 +26,8 @@ import network.Network.SyncEntities;
 import network.Network.Spawn;
 import network.Network.GoToMap;
 import systems.AIRandomMovementSystem;
+
+import javax.swing.*;
 
 public class ServerFrame extends TestAbstract<String>{
 
@@ -102,11 +105,11 @@ public class ServerFrame extends TestAbstract<String>{
 						connection.setName(spawn.name);
 						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
 
-						Entity newPlayer = new Entity();
+						Entity newPlayer = new Entity();;
 						newPlayer.add(new Name(spawn.name));
 						newPlayer.add(new MapName(spawn.mapName));
 						newPlayer.add(new Position(322,322));
-						worldData.engine.addEntity(newPlayer);
+						worldData.addEntity(newPlayer);
 
 						playerList.put(connection, newPlayer);
 					}else if (object instanceof GoToMap) {
@@ -122,19 +125,19 @@ public class ServerFrame extends TestAbstract<String>{
 						infoFrame.addLogLine("Moving player " + Mappers.nameM.get(player).name + " to " + goToMap.mapName);
 
 						//First remove player from old map
-						worldData.entitiesInMap.get(mapComponent.map).remove(player);
+						worldData.entitiesInMaps.get(mapComponent.map).remove(player);
 
 						//Make sure the entity knows what map it is in
 						mapComponent.map = goToMap.mapName;
 
 						//Finally add the player to the maps entity list
 						//If player moves to a map with no entities we create a new entity list for that map
-						if(worldData.entitiesInMap.get(mapComponent.map) == null){
+						if(worldData.entitiesInMaps.get(mapComponent.map) == null){
 							Vector<Entity> entitiesInMap = new Vector<Entity>();
 							entitiesInMap.add(player);
-							worldData.entitiesInMap.put(mapComponent.map, entitiesInMap);
+							worldData.entitiesInMaps.put(mapComponent.map, entitiesInMap);
 						}else{
-							worldData.entitiesInMap.get(mapComponent.map).add(player);
+							worldData.entitiesInMaps.get(mapComponent.map).add(player);
 						}
 					}
 				}
@@ -185,7 +188,7 @@ public class ServerFrame extends TestAbstract<String>{
 					newEntity.add(new Name(scn.next()));
 					newEntity.add(new MapName((scn.next())));
 					newEntity.add(new Position(scn.nextFloat(),scn.nextFloat()));
-					worldData.engine.addEntity(newEntity);
+					worldData.addEntity(newEntity);
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("argument 3 and 4 need to be floats");
 				}catch(NoSuchElementException e){
@@ -207,7 +210,7 @@ public class ServerFrame extends TestAbstract<String>{
 						newEntity.add(nameComponent);
 						newEntity.add(mapNameComponent);
 						newEntity.add(positionComponent);
-						worldData.engine.addEntity(newEntity);
+						worldData.addEntity(newEntity);
 					}
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("first argument needs to be an integer, second a String");
@@ -241,28 +244,29 @@ public class ServerFrame extends TestAbstract<String>{
 	private void clearEntities(){
 		//Remove entities from worldData
 		if(worldData != null)
-		worldData.engine.removeAllEntities();
+		worldData.removeAllEntities();
 
 		//Empty list mapping connections to player entities
 		playerList.clear();
 
 		//Send all clients an empty sync update
 		SyncEntities sync = new SyncEntities();
-		sync.entities = new Vector<Component[]>();
+		sync.entities = new HashMap<Long,Component[]>();
 		server.sendToAllTCP(sync);
 
 		infoFrame.addLogLine("Entities cleared");
 	}
 
-	private Vector<Component[]> createSyncPacket(Connection connection){
+	private HashMap<Long,Component[]> createSyncPacket(Connection connection){
 		Entity player = playerList.get(connection);
 		Vector<Entity> entitiesInPlayersMap = worldData.getEntitiesInMap(Mappers.mapM.get(player).map);
-		Vector<Component[]> entitiesAsComponents = new Vector<>();
+		HashMap<Long,Component[]> entitiesAsComponents = new HashMap<>();
 
 		for(Entity e : entitiesInPlayersMap){
+			long id = Mappers.idM.get(e).id;
 			ImmutableArray<Component> components = e.getComponents();
 			Component[] componentsArray = components.toArray(Component.class);
-			entitiesAsComponents.add(componentsArray);
+			entitiesAsComponents.put(id,componentsArray);
 		}
 		return entitiesAsComponents;
 	}
@@ -282,18 +286,22 @@ public class ServerFrame extends TestAbstract<String>{
 			syncsSent++;
 			syncsSentPerSecondCounter++;
 		}
-		worldData.engine.update(1);
-		infoFrame.setListItems(worldData.getEntitiesAsString());
+		worldData.updateWorld(1);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				infoFrame.setListItems(worldData.getEntitiesAsString());
 
-		//infoFrame.repaint();
-		updateSpecificInfo();
-	}
+				updateSpecificInfo();
+			}
+			});
+
+		}
 
 	private void loadWorld(String mapName){
 
 		clearEntities();
 		worldData = WorldLoader.loadWorld(mapName);
-		worldData.engine.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import components.NetworkID;
 import gui.TestAbstract;
 import network.Network;
 import network.Network.GoToMap;
@@ -62,6 +63,19 @@ public class ClientFrame extends TestAbstract<String>{
 					}
 					if (object instanceof SyncEntities) {
 						final SyncEntities status = (SyncEntities)object;
+
+						SwingUtilities.invokeLater(new Runnable() {
+
+							@Override
+							public void run() {
+								worldData.updateEntities(status.entities);
+								//FIXME Dont update infoFrame if sync isn't changing anything
+								infoFrame.setListItems(worldData.getEntitiesAsString());
+							}
+						});
+
+
+						/*
 						SwingUtilities.invokeLater(new Runnable() {
 
 							@Override
@@ -75,11 +89,11 @@ public class ClientFrame extends TestAbstract<String>{
 									}
 									worldData.engine.addEntity(e);
 								}
-								//FIXME Dont update infoFrame if sync isn't changing anything
-								infoFrame.setListItems(worldData.getEntitiesAsString());
+
 							}
 
 						});
+						*/
 						syncsReceived++;
 						syncsReceivedPerSecondCounter++;
 					}

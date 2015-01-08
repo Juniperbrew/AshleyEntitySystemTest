@@ -2,10 +2,7 @@ package core;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import components.Health;
-import components.MapName;
-import components.Name;
-import components.Position;
+import components.*;
 import tiled.core.Map;
 import tiled.core.MapLayer;
 import tiled.core.MapObject;
@@ -17,6 +14,8 @@ import java.util.*;
 
 public class WorldLoader {
 
+
+
 	public WorldLoader(){
 
 	}
@@ -25,8 +24,7 @@ public class WorldLoader {
 		String resFolderPath = (System.getProperty("user.dir") + File.separator + "res" + File.separator);
 
 		HashMap<String,Map> allMaps = new HashMap<String,Map>();
-		Engine engine = new Engine();
-		WorldData worldData = new WorldData(engine, allMaps);
+		WorldData worldData = new WorldData(new Engine(), allMaps);
 
 		System.out.println("#Loading world from: " + resFolderPath);
 		System.out.println("#Loading mainmap: " + startingMapName);
@@ -46,7 +44,6 @@ public class WorldLoader {
 		}
 		worldData.printEntities();
 		worldData.allMaps = allMaps;
-		worldData.engine = engine;
 		return worldData;
 	}
 	
@@ -72,7 +69,7 @@ public class WorldLoader {
 
 		Iterator<MapObject> objIterator = objectLayer.getObjects();
 		int objectCount = 0;
-		int collissionCount = 0;
+		int collisionCount = 0;
 		int entityCount = 0;
 		int messageCount = 0;
 		int teleportCount = 0;
@@ -80,17 +77,17 @@ public class WorldLoader {
 		int exitCount = 0;
 		int noTypeCount = 0;
 
-		System.out.println("##Listing non collission objects##");
+		System.out.println("##Listing non collision objects##");
 		while(objIterator.hasNext()){
 			objectCount++;
 			MapObject obj = objIterator.next();
-			if(obj.getType().equalsIgnoreCase("collission")){
-				collissionCount++;
+			if(obj.getType().equalsIgnoreCase("collision")){
+				collisionCount++;
 				//System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
 				//obj.getProperties().list(System.out);
 			}else if(obj.getType().equalsIgnoreCase("entity")){
 				entityCount++;
-				createEntity(worldData.engine, mapName, obj);
+				worldData.createEntity(mapName, obj);
 			}else if(obj.getType().equalsIgnoreCase("message")){
 				messageCount++;
 				System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
@@ -121,36 +118,16 @@ public class WorldLoader {
 				System.out.println();
 			}
 		}
-		System.out.println("Collission count: " + collissionCount);
+		System.out.println("Collision count: " + collisionCount);
 		System.out.println("Entity count: " + entityCount);
 		System.out.println("Message count: " + messageCount);
 		System.out.println("Teleport count: " + teleportCount);
 		System.out.println("Spawn count: " + spawnCount);
 		System.out.println("Exit count: " + exitCount);
 		System.out.println("Objects without type: " + noTypeCount);
-		System.out.println("Supported objects: " + (collissionCount+entityCount+messageCount+teleportCount+spawnCount+exitCount+noTypeCount));
+		System.out.println("Supported objects: " + (collisionCount+entityCount+messageCount+teleportCount+spawnCount+exitCount+noTypeCount));
 		System.out.println("Total object count: " + objectCount);
 		System.out.println();
-	}
-
-	private static void createEntity(Engine engine, String mapName, MapObject obj){
-		System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
-		Properties entityProperties = obj.getProperties();
-		entityProperties.list(System.out);
-		System.out.println();
-
-		Entity newEntity = new Entity();
-		newEntity.add(new Name(obj.getName()));
-		newEntity.add(new MapName(mapName));
-		newEntity.add(new Position(obj.getX(), obj.getY()));
-
-		if(entityProperties.containsKey("health")){
-			int health = Integer.parseInt(entityProperties.getProperty("health"));
-			newEntity.add(new Health(health));
-		}
-
-
-		engine.addEntity(newEntity);
 	}
 	
 	private static Map loadMap(String resFolderPath, String mapName){

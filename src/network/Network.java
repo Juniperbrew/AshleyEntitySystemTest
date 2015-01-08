@@ -1,5 +1,6 @@
 package network;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import com.badlogic.ashley.core.Component;
@@ -31,6 +32,9 @@ public class Network {
 		kryo.register(components.Position.class);
 		kryo.register(components.Velocity.class);
 		kryo.register(components.Health.class);
+		kryo.register(components.NetworkID.class);
+		kryo.register(java.util.HashMap.class);
+
 
     }
 	
@@ -39,7 +43,7 @@ public class Network {
 	}
 	
 	static public class SyncEntities{
-		public Vector<Component[]> entities;
+		public HashMap<Long,Component[]> entities;
 	}
 	
 	static public class MoveTo{
