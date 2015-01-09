@@ -15,10 +15,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import components.MapName;
-import components.Name;
-import components.NetworkID;
-import components.Position;
+import components.*;
 import gui.TestAbstract;
 import network.Network;
 import network.Network.Message;
@@ -81,27 +78,33 @@ public class ServerFrame extends TestAbstract<String>{
 			server.addListener(new Listener(){
 				public void received (Connection connection, Object object) {
 					if (object instanceof Message) {
-						Message request = (Message)object;
-						System.out.println(request.text);
-						infoFrame.addLogLine("Received message: " + request.text);
-
-						if(request.text.equalsIgnoreCase("ping")){
-							Message response = new Message();
-							response.text = "Pong";
-							connection.sendTCP(response);
-							infoFrame.addLogLine("Sent message: " + response.text);
+						Message message = (Message)object;
+						String senderName;
+						if(playerList.get(connection) == null){
+							//Player has no entity yet
+							senderName = null;
+						}else{
+							senderName = Mappers.nameM.get(playerList.get(connection)).name;
 						}
-
-						if(request.text.equalsIgnoreCase("sync")){
-
+						if(message.text.equalsIgnoreCase("ping")){
+							Message pong = new Message();
+							message.text = "SERVER: Pong";
+							connection.sendTCP(message);
+							infoFrame.addLogLine("Sent pong to " + senderName);
+						}else if(message.text.equalsIgnoreCase("sync")){
 							SyncEntities sync = new SyncEntities();
 							sync.entities = createSyncPacket(connection);
-
 							connection.sendTCP(sync);
-							infoFrame.addLogLine("Sent server status");
+							message.text = "SERVER: entities synced";
+							connection.sendTCP(message);
+							infoFrame.addLogLine("Sent server status to " + senderName);
+						}else{
+							//Normal chat message
+							infoFrame.addLogLine(senderName + ": " + message.text);
+							message.text = senderName + ": " + message.text;
+							server.sendToAllTCP(message);
 						}
 					}else if (object instanceof Spawn) {
-						infoFrame.addLogLine("Spawn");
 						Spawn spawn = (Spawn) object;
 						connection.setName(spawn.name);
 						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
@@ -110,11 +113,11 @@ public class ServerFrame extends TestAbstract<String>{
 						newPlayer.add(new Name(spawn.name));
 						newPlayer.add(new MapName(spawn.mapName));
 						newPlayer.add(new Position(322,322));
+						newPlayer.add(new Player());
 						worldData.addEntity(newPlayer);
 
 						playerList.put(connection, newPlayer);
 					}else if (object instanceof GoToMap) {
-						infoFrame.addLogLine("GoToMap");
 						GoToMap goToMap = (GoToMap) object;
 						Entity player = playerList.get(connection);
 						if(player == null){
@@ -155,21 +158,24 @@ public class ServerFrame extends TestAbstract<String>{
 	}
 
 	@Override
-	protected void parseCommand(String input){
-		//Parse common commands for client and server
-		super.parseCommand(input);
+	protected boolean parseCommand(String input){
 
 		//If input is not a command we send it as a message to all clients
 		if(input.charAt(0) != '!'){
-			Message request = new Message();
-			request.text = input;
-			infoFrame.addLogLine("Sent message: " + request.text);
-			server.sendToAllTCP(request);
-			//Parse server commands
+			Message message = new Message();
+			message.text = "SERVER: " + input;
+			infoFrame.addInfoLine("Sent message: " + message.text);
+			infoFrame.addLogLine(message.text);
+			server.sendToAllTCP(message);
+			return true;
 		}else{
+			//Parse common commands for client and server
+			if(super.parseCommand(input)){
+				return true;
+			}
 			String cleanCommand = input.substring(1);
 			Scanner scn = new Scanner(cleanCommand);
-
+			boolean commandParsed = false;
 			String command = scn.next();
 
 			if(command.equals("autosync")){
@@ -232,13 +238,9 @@ public class ServerFrame extends TestAbstract<String>{
 				commandParsed = true;
 				clearEntities();
 			}else{
-				if(commandParsed){
-					commandParsed = false;
-				}else{
-					infoFrame.addLogLine("Invalid command: " + command);
-				}
+				scn.close();
 			}
-			scn.close();
+			return commandParsed;
 		}
 	}
 

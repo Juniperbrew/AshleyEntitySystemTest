@@ -37,7 +37,7 @@ public class ClientFrame extends TestAbstract<String>{
 		Message request = new Message();
 		request.text = "Ping";
 		client.sendTCP(request);
-		infoFrame.addLogLine("Sent message: " + request.text);
+		infoFrame.addInfoLine("Sent message: " + request.text);
 	}
 
 	private void updateSpecificInfo(){
@@ -59,7 +59,7 @@ public class ClientFrame extends TestAbstract<String>{
 					if (object instanceof Message) {
 						Message response = (Message)object;
 						System.out.println(response.text);
-						infoFrame.addLogLine("Received message: " + response.text);
+						infoFrame.addLogLine(response.text);
 					}
 					if (object instanceof SyncEntities) {
 						final SyncEntities status = (SyncEntities)object;
@@ -91,7 +91,7 @@ public class ClientFrame extends TestAbstract<String>{
 	}
 
 	@Override
-	protected void parseCommand(String input){
+	protected boolean parseCommand(String input){
 		//Parse common commands for client and server
 		super.parseCommand(input);
 
@@ -100,12 +100,18 @@ public class ClientFrame extends TestAbstract<String>{
 			Message request = new Message();
 			request.text = input;
 			client.sendTCP(request);
-			infoFrame.addLogLine("Sent message: " + request.text);
+			infoFrame.addInfoLine("Sent message: " + request.text);
+			return true;
 			//Parse client commands
 		}else{
+
+			//Parse common commands for client and server
+			if(super.parseCommand(input)){
+				return true;
+			}
 			String cleanCommand = input.substring(1);
 			Scanner scn = new Scanner(cleanCommand);
-
+			boolean commandParsed = false;
 			String command = scn.next();
 
 			if(command.equals("spawn")){
@@ -133,16 +139,9 @@ public class ClientFrame extends TestAbstract<String>{
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("map command needs 1 argument");
 				}
-
-			}else{
-				if(commandParsed){
-					commandParsed = false;
-				}else{
-					infoFrame.addLogLine("Invalid command: " + command);
-				}
 			}
-
 			scn.close();
+			return commandParsed;
 		}
 	}
 

@@ -33,6 +33,7 @@ public class Network {
 		kryo.register(components.Velocity.class);
 		kryo.register(components.Health.class);
 		kryo.register(components.NetworkID.class);
+		kryo.register(components.Player.class);
 		kryo.register(java.util.HashMap.class);
 
 

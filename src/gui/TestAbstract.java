@@ -17,7 +17,6 @@ public abstract class TestAbstract<E> {
 
 	protected InfoFrame<E> infoFrame;
 
-	protected boolean commandParsed = false;
 	
 	//Controlling logic loop speed
 	int sleepTime = 500;
@@ -43,7 +42,9 @@ public abstract class TestAbstract<E> {
 		infoFrame.setVisible(true);
 		infoFrame.setCommandListener(new Runnable(){
 			public void run(){
-				parseCommand(infoFrame.getCommand());
+				if(!parseCommand(infoFrame.getCommand())){
+					infoFrame.addLogLine("Invalid command");
+				}
 			}
 		});
 
@@ -193,9 +194,10 @@ public abstract class TestAbstract<E> {
 			 + " Delta: " + (deltaNano/1000.0)+ "us" );
 	}
 
-	protected void parseCommand(String input){
+	protected boolean parseCommand(String input){
+
 		if(input.length() == 0){
-			return;
+			return true;
 		}
 		if(input.charAt(0) == '!'){
 			String cleanCommand = input.substring(1);
@@ -203,7 +205,6 @@ public abstract class TestAbstract<E> {
 
 			String command = scn.next();
 			if(command.equals("sleep")){
-				commandParsed = true;
 				try{
 					sleepTime = scn.nextInt();
 					infoFrame.addLogLine("Sleeptime is now " + sleepTime + "ms.");
@@ -212,8 +213,8 @@ public abstract class TestAbstract<E> {
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("sleep command needs 1 argument");
 				}
+				return true;
 			}else if(command.equals("tickrate")){
-				commandParsed = true;
 				try{
 					tickRate = scn.nextInt();
 					infoFrame.addLogLine("Tickrate is now " + tickRate);
@@ -222,8 +223,8 @@ public abstract class TestAbstract<E> {
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("tickrate command needs 1 argument");
 				}
+				return true;
 			}else if(command.equals("tick")){
-				commandParsed = true;
 				try{
 					lockTickRate = scn.nextBoolean();
 					infoFrame.addLogLine("Tickrate is now " + (lockTickRate ? "locked." : "unlocked."));
@@ -232,8 +233,8 @@ public abstract class TestAbstract<E> {
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("tick command needs 1 argument");
 				}
+				return true;
 			}else if(command.equals("minlog")){
-				commandParsed = true;
 				try{
 					String logLevel = scn.next();
 					
@@ -253,12 +254,11 @@ public abstract class TestAbstract<E> {
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("minlog command needs 1 argument");
 				}
+				return true;
 			}
 			scn.close();
-		}else{
-			//echo
-			infoFrame.addLogLine(input);
 		}
+		return false;
 	}
 	
 	/**This is called once in the constructor*/

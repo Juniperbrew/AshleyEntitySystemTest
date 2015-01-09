@@ -15,6 +15,7 @@ public class WorldData implements EntityListener {
     public HashMap<String,Map> allMaps;
 	public Vector<Long> entityIDs;
     public HashMap<String,Vector<Entity>> entitiesInMaps;
+    public Vector<String> playerList;
 
     private long networkIDCounter;
 
@@ -24,6 +25,7 @@ public class WorldData implements EntityListener {
         this.allMaps = allMaps;
         entitiesInMaps = new HashMap<String,Vector<Entity>>();
         entityIDs = new Vector<Long>();
+        playerList = new Vector<String>();
 
         engine.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
     }
@@ -40,11 +42,7 @@ public class WorldData implements EntityListener {
         for(String mapName : entitiesInMaps.keySet()){
             System.out.println(mapName + " contains following entities: ");
             for(Entity entity : entitiesInMaps.get(mapName)){
-                System.out.print(entity + " ");
-                for(Component component : entity.getComponents()){
-                    System.out.print(component.getClass() + " ");
-                }
-                System.out.println();
+                System.out.println(EntityToString.convert(entity));
             }
         }
     }
@@ -141,12 +139,6 @@ public class WorldData implements EntityListener {
     }
 
     public void addEntity(Entity e){
-        //If entity doesnt have a networkID we give it one
-        if(e.getComponent(NetworkID.class) == null){
-            e.add(new NetworkID(networkIDCounter));
-            networkIDCounter++;
-            System.out.println("Giving entity a network ID, this should never be called on client");
-        }
         engine.addEntity(e);
     }
 
@@ -167,6 +159,19 @@ public class WorldData implements EntityListener {
 	public void entityAdded(Entity entity) {
         String map = Mappers.mapM.get(entity).map;
         System.out.println("Added " + entity + " to map " + map);
+
+        //If entity doesnt have a networkID we give it one
+        if(entity.getComponent(NetworkID.class) == null){
+            entity.add(new NetworkID(networkIDCounter));
+            networkIDCounter++;
+            System.out.println("Giving entity a network ID, this should never be called on client");
+        }
+
+        //If entity is player we add his name to playerlist
+        if(entity.getComponent(Player.class) != null){
+            playerList.add(Mappers.nameM.get(entity).name);
+        }
+
         entityIDs.add(Mappers.idM.get(entity).id);
 
         if(entitiesInMaps.get(map) == null){
@@ -182,7 +187,14 @@ public class WorldData implements EntityListener {
 	public void entityRemoved(Entity entity) {
         String map = Mappers.mapM.get(entity).map;
         System.out.println("Removed " + entity + " from map " + map);
+
+        //Remove from id list
         entityIDs.remove(Mappers.idM.get(entity).id);
+
+        //If entity is player we remove him from playerlist
+        if(entity.getComponent(Player.class) != null){
+            playerList.remove(Mappers.nameM.get(entity).name);
+        }
 
         if(entitiesInMaps.get(map) == null){
             System.out.println("Tried to remove entity from a map that isn't listed this shouldnt happen");
