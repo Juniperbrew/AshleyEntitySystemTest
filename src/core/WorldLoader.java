@@ -1,8 +1,6 @@
 package core;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import components.*;
 import tiled.core.Map;
 import tiled.core.MapLayer;
 import tiled.core.MapObject;
@@ -23,7 +21,7 @@ public class WorldLoader {
 	public static WorldData loadWorld(String startingMapName){
 		String resFolderPath = (System.getProperty("user.dir") + File.separator + "res" + File.separator);
 
-		HashMap<String,Map> allMaps = new HashMap<String,Map>();
+		HashMap<String,Map> allMaps = new HashMap<>();
 		WorldData worldData = new WorldData(new Engine(), allMaps);
 
 		System.out.println("#Loading world from: " + resFolderPath);
@@ -54,6 +52,7 @@ public class WorldLoader {
 
 
 		Vector<MapLayer> mapLayers = worldData.allMaps.get(mapName).getLayers();
+		int mapHeightPixels = worldData.allMaps.get(mapName).getHeight()*worldData.allMaps.get(mapName).getTileHeight();
 		for(MapLayer layer: mapLayers){
 
 			Properties layerProperties = layer.getProperties();
@@ -66,6 +65,8 @@ public class WorldLoader {
 			layerProperties.list(System.out);
 		}
 		System.out.println();
+
+		System.out.println("Object layer height: " + mapHeightPixels);
 
 		Iterator<MapObject> objIterator = objectLayer.getObjects();
 		int objectCount = 0;
@@ -87,7 +88,7 @@ public class WorldLoader {
 				//obj.getProperties().list(System.out);
 			}else if(obj.getType().equalsIgnoreCase("entity")){
 				entityCount++;
-				worldData.createEntity(mapName, obj);
+				worldData.createEntity(mapName, obj, mapHeightPixels);
 			}else if(obj.getType().equalsIgnoreCase("message")){
 				messageCount++;
 				System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());

@@ -97,7 +97,6 @@ public class ServerFrame extends TestAbstract<String>{
 						String senderName = getPlayerName(connection);
 
 						if(message.text.equalsIgnoreCase("ping")){
-							Message pong = new Message();
 							message.text = "SERVER: Pong";
 							connection.sendTCP(message);
 							infoFrame.addLogLine("Sent pong to " + senderName);
@@ -116,7 +115,7 @@ public class ServerFrame extends TestAbstract<String>{
 						Spawn spawn = (Spawn) object;
 						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
 
-						Entity newPlayer = new Entity();;
+						Entity newPlayer = new Entity();
 						newPlayer.add(new Name(spawn.name));
 						newPlayer.add(new MapName(spawn.mapName));
 						newPlayer.add(new Position(322,322));
@@ -149,7 +148,7 @@ public class ServerFrame extends TestAbstract<String>{
 						//Finally add the player to the maps entity list
 						//If player moves to a map with no entities we create a new entity list for that map
 						if(worldData.entitiesInMaps.get(mapComponent.map) == null){
-							Vector<Entity> entitiesInMap = new Vector<Entity>();
+							Vector<Entity> entitiesInMap = new Vector<>();
 							entitiesInMap.add(player);
 							worldData.entitiesInMaps.put(mapComponent.map, entitiesInMap);
 						}else{
@@ -166,8 +165,8 @@ public class ServerFrame extends TestAbstract<String>{
 		}catch (IOException e) {
 			infoFrame.addExceptionLine(e.getMessage());
 			StackTraceElement[] stackTrace = e.getStackTrace();
-			for(int i = 0; i < stackTrace.length;i++){
-				infoFrame.addExceptionLine(stackTrace[i].toString());
+			for(StackTraceElement stack : stackTrace){
+				infoFrame.addExceptionLine(stack.toString());
 			}
 			e.printStackTrace();
 		}
@@ -270,7 +269,7 @@ public class ServerFrame extends TestAbstract<String>{
 
 		//Send all clients an empty sync update
 		SyncEntities sync = new SyncEntities();
-		sync.entities = new HashMap<Long,Component[]>();
+		sync.entities = new HashMap<>();
 		server.sendToAllTCP(sync);
 
 		infoFrame.addLogLine("Entities cleared");
@@ -307,7 +306,7 @@ public class ServerFrame extends TestAbstract<String>{
 	private void sync(Connection connection){
 		//Sync playerlist
 		SyncPlayerList syncPlayerList = new SyncPlayerList();
-		Vector<String> playerNameList = new Vector<String>();
+		Vector<String> playerNameList = new Vector<>();
 		for(Connection c : server.getConnections()){
 			playerNameList.add(getPlayerName(c));
 		}
@@ -330,12 +329,15 @@ public class ServerFrame extends TestAbstract<String>{
 	@Override
 	protected void doLogic() {
 
-
-
 		//Auto sync clients	
 		if(autoSync){
 			for(Connection connection : server.getConnections()){
-				sync(connection);
+				//FIXME Sync only when writebuffer is empty this removes all bufferoverflows and keeps syncrate the same, TcpIdleSender alternative solution which caused much more lag
+				if(connection.getTcpWriteBufferSize() == 0){
+					sync(connection);
+				}else{
+					infoFrame.addLogLine(connection + " has data in writebuffer, throttling autosync.");
+				}
 			}
 			syncsSent++;
 			syncsSentPerSecondCounter++;
@@ -353,15 +355,15 @@ public class ServerFrame extends TestAbstract<String>{
 		}
 
 	private void loadWorld(String mapName){
-
 		clearEntities();
 		worldData = WorldLoader.loadWorld(mapName);
+		worldData.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
 	}
 
 	@Override
 	protected void initialize() {
 		startServer();
-		playerList = new HashMap<Connection,Entity>();
+		playerList = new HashMap<>();
 		loadWorld("untitled.tmx");
 	}
 

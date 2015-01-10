@@ -11,7 +11,6 @@ import java.util.Scanner;
 import javax.swing.ListCellRenderer;
 
 import com.esotericsoftware.minlog.Log;
-import gui.InfoFrame;
 
 public abstract class TestAbstract<E> {
 
@@ -38,7 +37,7 @@ public abstract class TestAbstract<E> {
 	int minLogLevel = Log.LEVEL_INFO;
 
 	public TestAbstract(){
-		infoFrame = new InfoFrame<E>();
+		infoFrame = new InfoFrame<>();
 		infoFrame.setVisible(true);
 		infoFrame.setCommandListener(new Runnable(){
 			public void run(){
@@ -96,8 +95,9 @@ public abstract class TestAbstract<E> {
 			}
 		};
 
+		//Exceptions still output in console
+		//FIXME Find way to output both in console and GUI
 		System.setOut(new PrintStream(out, true));
-		System.setErr(new PrintStream(out, true));
 	}
 
 
@@ -207,6 +207,9 @@ public abstract class TestAbstract<E> {
 			if(command.equals("sleep")){
 				try{
 					sleepTime = scn.nextInt();
+					if(sleepTime < 1){
+						sleepTime = 1;
+					}
 					infoFrame.addLogLine("Sleeptime is now " + sleepTime + "ms.");
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("argument needs to be integer");

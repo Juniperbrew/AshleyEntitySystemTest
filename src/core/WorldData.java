@@ -2,7 +2,6 @@ package core;
 
 import com.badlogic.ashley.core.*;
 import components.*;
-import systems.AIRandomMovementSystem;
 import tiled.core.Map;
 import tiled.core.MapObject;
 import util.EntityToString;
@@ -23,11 +22,13 @@ public class WorldData implements EntityListener {
         this.engine = engine;
         engine.addEntityListener(this);
         this.allMaps = allMaps;
-        entitiesInMaps = new HashMap<String,Vector<Entity>>();
-        entityIDs = new Vector<Long>();
-        playerList = new Vector<String>();
+        entitiesInMaps = new HashMap<>();
+        entityIDs = new Vector<>();
+        playerList = new Vector<>();
+    }
 
-        engine.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
+    public void addSystem(EntitySystem system){
+        engine.addSystem(system);
     }
 
     public int getEntityCount(){
@@ -59,7 +60,7 @@ public class WorldData implements EntityListener {
     }
 
     public Vector<String> getEntitiesAsString(){
-        Vector<String> entitiesAsString = new Vector<String>();
+        Vector<String> entitiesAsString = new Vector<>();
         for(String mapName : entitiesInMaps.keySet()) {
             for (Entity e : entitiesInMaps.get(mapName)) {
                 entitiesAsString.add(EntityToString.convert(e));
@@ -118,7 +119,7 @@ public class WorldData implements EntityListener {
 
     }
 
-    protected void createEntity(String mapName, MapObject obj){
+    protected void createEntity(String mapName, MapObject obj, int mapHeightPixels){
         System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
         Properties entityProperties = obj.getProperties();
         entityProperties.list(System.out);
@@ -127,18 +128,24 @@ public class WorldData implements EntityListener {
         Entity newEntity = new Entity();
         newEntity.add(new Name(obj.getName()));
         newEntity.add(new MapName(mapName));
-        newEntity.add(new Position(obj.getX(), obj.getY()));
+        //Y axis needs to be inverted because tiled map editor has origo in top left
+        newEntity.add(new Position(obj.getX(), mapHeightPixels-obj.getY()));
 
         if(entityProperties.containsKey("health")){
             int health = Integer.parseInt(entityProperties.getProperty("health"));
             newEntity.add(new Health(health));
         }
 
-
         addEntity(newEntity);
     }
 
     public void addEntity(Entity e){
+        //If entity doesnt have a networkID we give it one
+        if(e.getComponent(NetworkID.class) == null){
+            e.add(new NetworkID(networkIDCounter));
+            networkIDCounter++;
+            System.out.println("Giving entity a network ID, this should never be called on client");
+        }
         engine.addEntity(e);
     }
     public void removeEntity(Entity e){
@@ -163,13 +170,6 @@ public class WorldData implements EntityListener {
         String map = Mappers.mapM.get(entity).map;
         System.out.println("Added " + EntityToString.convert(entity) + " to map " + map);
 
-        //If entity doesnt have a networkID we give it one
-        if(entity.getComponent(NetworkID.class) == null){
-            entity.add(new NetworkID(networkIDCounter));
-            networkIDCounter++;
-            System.out.println("Giving entity a network ID, this should never be called on client");
-        }
-
         //If entity is player we add his name to playerlist
         if(entity.getComponent(Player.class) != null){
             playerList.add(Mappers.nameM.get(entity).name);
@@ -178,7 +178,7 @@ public class WorldData implements EntityListener {
         entityIDs.add(Mappers.idM.get(entity).id);
 
         if(entitiesInMaps.get(map) == null){
-            Vector<Entity> entities = new Vector<Entity>();
+            Vector<Entity> entities = new Vector<>();
             entities.add(entity);
             entitiesInMaps.put(map,entities);
         }else{
