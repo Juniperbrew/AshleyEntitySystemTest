@@ -22,6 +22,7 @@ import network.Network.Message;
 import network.Network.SyncEntities;
 import network.Network.Spawn;
 import network.Network.GoToMap;
+import network.Network.*;
 import systems.AIRandomMovementSystem;
 
 import javax.swing.*;
@@ -76,25 +77,32 @@ public class ServerFrame extends TestAbstract<String>{
 
 
 			server.addListener(new Listener(){
+				public void connected (Connection connection) {
+					sync(connection);
+				}
+				/** Called when the remote end is no longer connected. There is no guarantee as to what thread will invoke this method. */
+				public void disconnected (Connection connection) {
+					Entity player = playerList.get(connection);
+					if(player != null){
+						worldData.removeEntity(player);
+						playerList.remove(connection);
+					}
+				}
 				public void received (Connection connection, Object object) {
-					if (object instanceof Message) {
+					if (object instanceof Register) {
+						Register register = (Register) object;
+						connection.setName(register.connectionName);
+					} else if (object instanceof Message) {
 						Message message = (Message)object;
-						String senderName;
-						if(playerList.get(connection) == null){
-							//Player has no entity yet
-							senderName = null;
-						}else{
-							senderName = Mappers.nameM.get(playerList.get(connection)).name;
-						}
+						String senderName = getPlayerName(connection);
+
 						if(message.text.equalsIgnoreCase("ping")){
 							Message pong = new Message();
 							message.text = "SERVER: Pong";
 							connection.sendTCP(message);
 							infoFrame.addLogLine("Sent pong to " + senderName);
 						}else if(message.text.equalsIgnoreCase("sync")){
-							SyncEntities sync = new SyncEntities();
-							sync.entities = createSyncPacket(connection);
-							connection.sendTCP(sync);
+							sync(connection);
 							message.text = "SERVER: entities synced";
 							connection.sendTCP(message);
 							infoFrame.addLogLine("Sent server status to " + senderName);
@@ -106,7 +114,6 @@ public class ServerFrame extends TestAbstract<String>{
 						}
 					}else if (object instanceof Spawn) {
 						Spawn spawn = (Spawn) object;
-						connection.setName(spawn.name);
 						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
 
 						Entity newPlayer = new Entity();;
@@ -117,6 +124,11 @@ public class ServerFrame extends TestAbstract<String>{
 						worldData.addEntity(newPlayer);
 
 						playerList.put(connection, newPlayer);
+						//Tell the player they are now in a map so they can load it
+						GoToMap goToMap = new GoToMap();
+						goToMap.mapName = spawn.mapName;
+						connection.sendTCP(goToMap);
+
 					}else if (object instanceof GoToMap) {
 						GoToMap goToMap = (GoToMap) object;
 						Entity player = playerList.get(connection);
@@ -143,6 +155,10 @@ public class ServerFrame extends TestAbstract<String>{
 						}else{
 							worldData.entitiesInMaps.get(mapComponent.map).add(player);
 						}
+
+						//Confirm to the player they changed map so they can load it
+						//Just sending the same packet back there should be no other reason for a client to get a GoToMap packet
+						connection.sendTCP(goToMap);
 					}
 				}
 			});
@@ -262,7 +278,10 @@ public class ServerFrame extends TestAbstract<String>{
 
 	private HashMap<Long,Component[]> createSyncPacket(Connection connection){
 		Entity player = playerList.get(connection);
-		Vector<Entity> entitiesInPlayersMap = worldData.getEntitiesInMap(Mappers.mapM.get(player).map);
+
+		MapName playerMapNameComponent = Mappers.mapM.get(player);
+
+		Vector<Entity> entitiesInPlayersMap = worldData.getEntitiesInMap(playerMapNameComponent.map);
 		HashMap<Long,Component[]> entitiesAsComponents = new HashMap<>();
 
 		for(Entity e : entitiesInPlayersMap){
@@ -274,18 +293,50 @@ public class ServerFrame extends TestAbstract<String>{
 		return entitiesAsComponents;
 	}
 
-	@Override
-	protected void doLogic() {
+	private String getPlayerName(Connection connection){
+		String name;
+		if(playerList.get(connection) == null){
+			//Player has no entity yet
+			name = connection.toString();
+		}else{
+			name = connection.toString()+"["+Mappers.nameM.get(playerList.get(connection)).name+"]";
+		}
+		return name;
+	}
 
-		//Auto sync clients	
-		if(autoSync){
-			for(Connection connection : playerList.keySet()){
+	private void sync(Connection connection){
+		//Sync playerlist
+		SyncPlayerList syncPlayerList = new SyncPlayerList();
+		Vector<String> playerNameList = new Vector<String>();
+		for(Connection c : server.getConnections()){
+			playerNameList.add(getPlayerName(c));
+		}
+		syncPlayerList.playerList = playerNameList;
+		connection.sendTCP(syncPlayerList);
+
+		//If player has spawned we sync entities
+		if(playerList.get(connection) != null) {
+			//Player is not necessarily yet added to the engine so we need to check that too
+			if(Mappers.playerM.get(playerList.get(connection)) != null){
 				SyncEntities sync = new SyncEntities();
 				sync.entities = createSyncPacket(connection);
 				connection.sendTCP(sync);
-				//infoFrame.addLogLine("Sent entity status to " + Mappers.nameM.get(playerList.get(connection)).name);
+			}else{
+				System.out.println("Player is spawned but not yet added to engine.");
 			}
+		}
+	}
 
+	@Override
+	protected void doLogic() {
+
+
+
+		//Auto sync clients	
+		if(autoSync){
+			for(Connection connection : server.getConnections()){
+				sync(connection);
+			}
 			syncsSent++;
 			syncsSentPerSecondCounter++;
 		}

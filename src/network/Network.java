@@ -35,9 +35,17 @@ public class Network {
 		kryo.register(components.NetworkID.class);
 		kryo.register(components.Player.class);
 		kryo.register(java.util.HashMap.class);
+		kryo.register(Register.class);
+		kryo.register(SyncPlayerList.class);
+	}
 
+	static public class SyncPlayerList{
+		public Vector<String> playerList;
+	}
 
-    }
+	static public class Register {
+		public String connectionName;
+	}
 	
 	static public class Message{
 		public String text;

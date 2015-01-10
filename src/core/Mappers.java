@@ -9,4 +9,5 @@ public class Mappers {
     public static final ComponentMapper<Name> nameM = ComponentMapper.getFor(Name.class);
     public static final ComponentMapper<MapName> mapM = ComponentMapper.getFor(MapName.class);
     public static final ComponentMapper<NetworkID> idM = ComponentMapper.getFor(NetworkID.class);
+    public static final ComponentMapper<Player> playerM = ComponentMapper.getFor(Player.class);
 }

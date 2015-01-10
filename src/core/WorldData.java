@@ -141,6 +141,9 @@ public class WorldData implements EntityListener {
     public void addEntity(Entity e){
         engine.addEntity(e);
     }
+    public void removeEntity(Entity e){
+        engine.removeEntity(e);
+    }
 
     public void removeAllEntities(){
         engine.removeAllEntities();
@@ -158,7 +161,7 @@ public class WorldData implements EntityListener {
 	@Override
 	public void entityAdded(Entity entity) {
         String map = Mappers.mapM.get(entity).map;
-        System.out.println("Added " + entity + " to map " + map);
+        System.out.println("Added " + EntityToString.convert(entity) + " to map " + map);
 
         //If entity doesnt have a networkID we give it one
         if(entity.getComponent(NetworkID.class) == null){
@@ -186,7 +189,7 @@ public class WorldData implements EntityListener {
 	@Override
 	public void entityRemoved(Entity entity) {
         String map = Mappers.mapM.get(entity).map;
-        System.out.println("Removed " + entity + " from map " + map);
+        System.out.println("Removed " + EntityToString.convert(entity) + " from map " + map);
 
         //Remove from id list
         entityIDs.remove(Mappers.idM.get(entity).id);
