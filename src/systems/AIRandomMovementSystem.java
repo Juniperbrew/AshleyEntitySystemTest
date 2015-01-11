@@ -27,7 +27,10 @@ public class AIRandomMovementSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Position position = Mappers.positionM.get(entity);
 
-        position.x += ((rng.nextFloat()*5)-2.5f)*deltaTime;
-        position.y += ((rng.nextFloat()*5)-2.5f)*deltaTime;
+        //Dont move players
+        if(Mappers.playerM.get(entity) == null) {
+            position.x += ((rng.nextFloat() * 5) - 2.5f) * deltaTime;
+            position.y += ((rng.nextFloat() * 5) - 2.5f) * deltaTime;
+        }
     }
 }
