@@ -120,16 +120,22 @@ public class WorldData implements EntityListener {
     }
 
     protected void createEntity(String mapName, MapObject obj, int mapHeightPixels){
-        System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
+        System.out.println("Name: " + obj.getName() + " Type: " + obj.getType() + " Gid: " + obj.getGid());
+        int gid = obj.getGid();
         Properties entityProperties = obj.getProperties();
         entityProperties.list(System.out);
         System.out.println();
+
 
         Entity newEntity = new Entity();
         newEntity.add(new Name(obj.getName()));
         newEntity.add(new MapName(mapName));
         //Y axis needs to be inverted because tiled map editor has origo in top left
         newEntity.add(new Position(obj.getX(), mapHeightPixels-obj.getY()));
+
+        if(gid > 0){
+            newEntity.add(new Gid(gid));
+        }
 
         if(entityProperties.containsKey("health")){
             int health = Integer.parseInt(entityProperties.getProperty("health"));

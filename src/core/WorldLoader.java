@@ -78,6 +78,7 @@ public class WorldLoader {
 		int exitCount = 0;
 		int noTypeCount = 0;
 
+
 		System.out.println("##Listing non collision objects##");
 		while(objIterator.hasNext()){
 			objectCount++;

@@ -4,10 +4,9 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
+import components.Gid;
 
 public class Network {
 	
@@ -25,7 +24,6 @@ public class Network {
 
 		kryo.register(com.badlogic.ashley.core.Component[].class);
 		kryo.register(Component.class);
-		kryo.register(com.badlogic.gdx.utils.Array.class);
 		kryo.register(Object[].class);
 		kryo.register(components.Name.class);
 		kryo.register(components.MapName.class);
@@ -37,6 +35,7 @@ public class Network {
 		kryo.register(java.util.HashMap.class);
 		kryo.register(Register.class);
 		kryo.register(SyncPlayerList.class);
+		kryo.register(Gid.class);
 	}
 
 	static public class SyncPlayerList{
