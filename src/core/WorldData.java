@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import components.*;
 import tiled.core.Map;
 import tiled.core.MapObject;
+import tiled.core.Tile;
 import util.EntityToString;
 
 import java.util.*;
@@ -51,7 +52,7 @@ public class WorldData implements EntityListener {
     public Entity getEntityWithID(long id){
         for(Vector<Entity> entitiesInMap : entitiesInMaps.values()){
             for(Entity e : entitiesInMap){
-                if(Mappers.idM.get(e).id == id){
+                if(Mappers.networkidM.get(e).id == id){
                     return e;
                 }
             }
@@ -120,28 +121,29 @@ public class WorldData implements EntityListener {
     }
 
     protected void createEntity(String mapName, MapObject obj, int mapHeightPixels){
-        System.out.println("Name: " + obj.getName() + " Type: " + obj.getType() + " Gid: " + obj.getGid());
-        int gid = obj.getGid();
+        Entity newEntity = new Entity();
+        Tile tile = obj.getTile();
+        if(tile != null){
+            int tileID = obj.getTile().getId();
+            newEntity.add(new TileID(tileID));
+            System.out.println("Name: " + obj.getName() + " Type: " + obj.getType() + " TileID: " + tileID);
+        }else{
+            System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
+        }
+
         Properties entityProperties = obj.getProperties();
         entityProperties.list(System.out);
         System.out.println();
 
-
-        Entity newEntity = new Entity();
         newEntity.add(new Name(obj.getName()));
         newEntity.add(new MapName(mapName));
         //Y axis needs to be inverted because tiled map editor has origo in top left
         newEntity.add(new Position(obj.getX(), mapHeightPixels-obj.getY()));
 
-        if(gid > 0){
-            newEntity.add(new Gid(gid));
-        }
-
         if(entityProperties.containsKey("health")){
             int health = Integer.parseInt(entityProperties.getProperty("health"));
             newEntity.add(new Health(health));
         }
-
         addEntity(newEntity);
     }
 
@@ -150,7 +152,7 @@ public class WorldData implements EntityListener {
         if(e.getComponent(NetworkID.class) == null){
             e.add(new NetworkID(networkIDCounter));
             networkIDCounter++;
-            System.out.println("Giving entity a network ID, this should never be called on client");
+            System.out.println("Giving entity " + Mappers.nameM.get(e).name + " a network ID, this should never be called on client");
         }
         engine.addEntity(e);
     }
@@ -181,7 +183,7 @@ public class WorldData implements EntityListener {
             playerList.add(Mappers.nameM.get(entity).name);
         }
 
-        entityIDs.add(Mappers.idM.get(entity).id);
+        entityIDs.add(Mappers.networkidM.get(entity).id);
 
         if(entitiesInMaps.get(map) == null){
             Vector<Entity> entities = new Vector<>();
@@ -198,7 +200,7 @@ public class WorldData implements EntityListener {
         System.out.println("Removed " + EntityToString.convert(entity) + " from map " + map);
 
         //Remove from id list
-        entityIDs.remove(Mappers.idM.get(entity).id);
+        entityIDs.remove(Mappers.networkidM.get(entity).id);
 
         //If entity is player we remove him from playerlist
         if(entity.getComponent(Player.class) != null){

@@ -158,6 +158,22 @@ public class ServerFrame extends TestAbstract<String>{
 						//Confirm to the player they changed map so they can load it
 						//Just sending the same packet back there should be no other reason for a client to get a GoToMap packet
 						connection.sendTCP(goToMap);
+					}else if (object instanceof UpdateEntity) {
+						infoFrame.addLogLine("Received UpdateEntity, not handling.");
+					}
+					else if (object instanceof UpdateComponent) {
+						UpdateComponent updateComponent = (UpdateComponent) object;
+						Entity entity = worldData.getEntityWithID(updateComponent.networkID);
+						Component updatedComponent = updateComponent.component;
+						if(updatedComponent instanceof Position){
+							Position updatedPos = (Position) updatedComponent;
+							Position entityPos = entity.getComponent(Position.class);
+							entityPos.x = updatedPos.x;
+							entityPos.y = updatedPos.y;
+						}else{
+							infoFrame.addLogLine(connection + " is trying to update unsupported component");
+						}
+
 					}
 				}
 			});
@@ -284,7 +300,7 @@ public class ServerFrame extends TestAbstract<String>{
 		HashMap<Long,Component[]> entitiesAsComponents = new HashMap<>();
 
 		for(Entity e : entitiesInPlayersMap){
-			long id = Mappers.idM.get(e).id;
+			long id = Mappers.networkidM.get(e).id;
 			ImmutableArray<Component> components = e.getComponents();
 			Component[] componentsArray = components.toArray(Component.class);
 			entitiesAsComponents.put(id,componentsArray);
