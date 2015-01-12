@@ -115,18 +115,26 @@ public class ServerFrame extends TestAbstract<String>{
 						Spawn spawn = (Spawn) object;
 						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
 
+						//We ignore the coordinates the client sent and make up our own
+						int x = 322;
+						int y = 322;
+						long networkID = worldData.getNextNetworkID();
+
 						Entity newPlayer = new Entity();
+						newPlayer.add(new NetworkID(networkID));
 						newPlayer.add(new Name(spawn.name));
 						newPlayer.add(new MapName(spawn.mapName));
-						newPlayer.add(new Position(322,322));
+						newPlayer.add(new Position(x,y));
 						newPlayer.add(new Player());
 						worldData.addEntity(newPlayer);
 
+						//We send the spawn packet back with the modified coordinates as confirmation to client
+						spawn.x = x;
+						spawn.y = x;
+						spawn.networkID = networkID;
+
+						connection.sendTCP(spawn);
 						playerList.put(connection, newPlayer);
-						//Tell the player they are now in a map so they can load it
-						GoToMap goToMap = new GoToMap();
-						goToMap.mapName = spawn.mapName;
-						connection.sendTCP(goToMap);
 
 					}else if (object instanceof GoToMap) {
 						GoToMap goToMap = (GoToMap) object;

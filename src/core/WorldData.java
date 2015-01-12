@@ -147,11 +147,17 @@ public class WorldData implements EntityListener {
         addEntity(newEntity);
     }
 
+    public long getNextNetworkID(){
+        long nextID = networkIDCounter;
+        networkIDCounter++;
+        System.out.println("Assigning networkID: " + nextID);
+        return nextID;
+    }
+
     public void addEntity(Entity e){
         //If entity doesnt have a networkID we give it one
         if(e.getComponent(NetworkID.class) == null){
-            e.add(new NetworkID(networkIDCounter));
-            networkIDCounter++;
+            e.add(new NetworkID(getNextNetworkID()));
             System.out.println("Giving entity " + Mappers.nameM.get(e).name + " a network ID, this should never be called on client");
         }
         engine.addEntity(e);

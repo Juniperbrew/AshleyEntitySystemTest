@@ -78,5 +78,8 @@ public class Network {
 	static public class Spawn{
 		public String name;
 		public String mapName;
+		public int x;
+		public int y;
+		public long networkID;
 	}
 }
