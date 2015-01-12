@@ -3,8 +3,8 @@ package systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import components.Position;
-import components.Velocity;
+import components.shared.Position;
+import components.shared.Velocity;
 import core.Mappers;
 
 public class MovementSystem extends IteratingSystem {

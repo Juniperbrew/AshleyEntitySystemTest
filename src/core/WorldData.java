@@ -1,7 +1,9 @@
 package core;
 
 import com.badlogic.ashley.core.*;
-import components.*;
+import com.badlogic.ashley.utils.ImmutableArray;
+import components.server.Target;
+import components.shared.*;
 import tiled.core.Map;
 import tiled.core.MapObject;
 import tiled.core.Tile;
@@ -13,7 +15,7 @@ public class WorldData implements EntityListener {
 
     private Engine engine;
     public HashMap<String,Map> allMaps;
-	public Vector<Long> entityIDs;
+    public HashMap<Long,Entity> entityIDs;
     public HashMap<String,Vector<Entity>> entitiesInMaps;
     public Vector<String> playerList;
 
@@ -24,7 +26,7 @@ public class WorldData implements EntityListener {
         engine.addEntityListener(this);
         this.allMaps = allMaps;
         entitiesInMaps = new HashMap<>();
-        entityIDs = new Vector<>();
+        entityIDs = new HashMap<>();
         playerList = new Vector<>();
     }
 
@@ -50,14 +52,7 @@ public class WorldData implements EntityListener {
     }
 
     public Entity getEntityWithID(long id){
-        for(Vector<Entity> entitiesInMap : entitiesInMaps.values()){
-            for(Entity e : entitiesInMap){
-                if(Mappers.networkidM.get(e).id == id){
-                    return e;
-                }
-            }
-        }
-        return null;
+        return entityIDs.get(id);
     }
 
     public Vector<String> getEntitiesAsString(){
@@ -102,7 +97,7 @@ public class WorldData implements EntityListener {
         //Copy id list to avoid ConcurrentModificationException caused by calls to entityRemoved(Entity e)
         //FIXME is this a good idea
         Vector<Long> idListCopy = new Vector<>();
-        for(long id : entityIDs){
+        for(long id : entityIDs.keySet()){
             idListCopy.add(id);
         }
 
@@ -179,6 +174,10 @@ public class WorldData implements EntityListener {
         engine.update(deltaTime);
     }
 
+    public void addFamilyListener(Family family, EntityListener listener){
+        engine.addEntityListener(family, listener);
+    }
+
 	@Override
 	public void entityAdded(Entity entity) {
         String map = Mappers.mapM.get(entity).map;
@@ -189,7 +188,7 @@ public class WorldData implements EntityListener {
             playerList.add(Mappers.nameM.get(entity).name);
         }
 
-        entityIDs.add(Mappers.networkidM.get(entity).id);
+        entityIDs.put(Mappers.networkidM.get(entity).id, entity);
 
         if(entitiesInMaps.get(map) == null){
             Vector<Entity> entities = new Vector<>();
@@ -202,6 +201,16 @@ public class WorldData implements EntityListener {
 
 	@Override
 	public void entityRemoved(Entity entity) {
+        //The target component might have a reference to this removed entity
+        //FIXME feels awkward to do this check here maybe the target component should be on the actual target instead of on the entity following
+        ImmutableArray<Entity> entitiesWithATarget = engine.getEntitiesFor(Family.all(Target.class).get());
+        for(Entity e : entitiesWithATarget){
+            if(Mappers.targetM.get(e).target.equals(entity)){
+                System.out.println("Removed target " + entity.getComponent(Name.class).name + " from " + Mappers.nameM.get(e).name);
+                e.remove(Target.class);
+            }
+        }
+
         String map = Mappers.mapM.get(entity).map;
         System.out.println("Removed " + EntityToString.convert(entity) + " from map " + map);
 

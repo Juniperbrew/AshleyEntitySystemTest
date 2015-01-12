@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.*;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import components.NetworkID;
 import gui.TestAbstract;
 import network.Network;
 import network.Network.GoToMap;

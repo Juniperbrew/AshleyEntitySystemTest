@@ -6,7 +6,7 @@ import java.util.Vector;
 import com.badlogic.ashley.core.Component;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
-import components.*;
+import components.shared.*;
 
 public class Network {
 	

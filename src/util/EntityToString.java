@@ -3,7 +3,7 @@ package util;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.utils.ImmutableArray;
-import components.*;
+import components.shared.*;
 
 public class EntityToString {
 

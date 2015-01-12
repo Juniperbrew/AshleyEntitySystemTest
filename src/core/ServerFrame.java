@@ -3,11 +3,7 @@ package core;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.Vector;
+import java.util.*;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.core.Component;
@@ -15,7 +11,8 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import components.*;
+import components.server.Target;
+import components.shared.*;
 import gui.TestAbstract;
 import network.Network;
 import network.Network.Message;
@@ -23,6 +20,7 @@ import network.Network.SyncEntities;
 import network.Network.Spawn;
 import network.Network.GoToMap;
 import network.Network.*;
+import systems.AIFollowEntitySystem;
 import systems.AIRandomMovementSystem;
 
 import javax.swing.*;
@@ -234,11 +232,15 @@ public class ServerFrame extends TestAbstract<String>{
 					newEntity.add(new Name(scn.next()));
 					newEntity.add(new MapName((scn.next())));
 					newEntity.add(new Position(scn.nextFloat(),scn.nextFloat()));
+					if(scn.hasNext()) {
+						Target target = new Target(worldData.getEntityWithID(scn.nextLong()));
+						newEntity.add(target);
+					}
 					worldData.addEntity(newEntity);
 				}catch(InputMismatchException e){
-					infoFrame.addLogLine("argument 3 and 4 need to be floats");
+					infoFrame.addLogLine("argument 3 and 4 need to be floats, argument 5 needs to be integer");
 				}catch(NoSuchElementException e){
-					infoFrame.addLogLine("add command needs 4 arguments");
+					infoFrame.addLogLine("add command needs 4 or 5 arguments");
 				}
 			}else if(command.equals("addbulk")){
 				commandParsed = true;
@@ -309,8 +311,17 @@ public class ServerFrame extends TestAbstract<String>{
 
 		for(Entity e : entitiesInPlayersMap){
 			long id = Mappers.networkidM.get(e).id;
+			//FIXME i have an ImmutableArray from which an ArrayList selects components and this ArrayList is finally converted to a normal Array, seems really inefficient
 			ImmutableArray<Component> components = e.getComponents();
-			Component[] componentsArray = components.toArray(Component.class);
+			ArrayList<Component> updatedComponents = new ArrayList();
+			for(Component component : components){
+				if(component instanceof Target){
+					//Don't send server only components
+					continue;
+				}
+				updatedComponents.add(component);
+			}
+			Component[] componentsArray = updatedComponents.toArray(new Component[updatedComponents.size()]);
 			entitiesAsComponents.put(id,componentsArray);
 		}
 		return entitiesAsComponents;
@@ -381,7 +392,10 @@ public class ServerFrame extends TestAbstract<String>{
 	private void loadWorld(String mapName){
 		clearEntities();
 		worldData = WorldLoader.loadWorld(mapName);
-		worldData.addSystem(new AIRandomMovementSystem(Family.all(Position.class).get()));
+		worldData.addSystem(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class).get()));
+		AIFollowEntitySystem aiFollowEntitySystem = new AIFollowEntitySystem(Family.all(Target.class).get());
+		worldData.addFamilyListener(Family.all(Target.class).get(), aiFollowEntitySystem);
+		worldData.addSystem(aiFollowEntitySystem);
 	}
 
 	@Override
