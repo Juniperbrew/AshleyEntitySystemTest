@@ -1,10 +1,10 @@
 package systems;
 
 import com.badlogic.ashley.core.*;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.MathUtils;
+import components.server.Destination;
 import components.server.Target;
-import components.shared.NetworkID;
 import components.shared.Position;
 import core.Mappers;
 
@@ -13,13 +13,12 @@ import java.util.Vector;
 /**
  * Created by Juniperbrew on 12.1.2015.
  */
-public class AIFollowEntitySystem extends EntitySystem implements EntityListener{
+public class AIMoveToDestinationSystem extends EntitySystem implements EntityListener {
 
     private Family family;
     private float speed = 5; //pixels per sec
     Vector<Entity> entities;
-
-    public AIFollowEntitySystem(Family family) {
+    public AIMoveToDestinationSystem(Family family) {
         this.family = family;
         entities = new Vector<>();
     }
@@ -27,24 +26,27 @@ public class AIFollowEntitySystem extends EntitySystem implements EntityListener
     @Override
     public void update (float deltaTime) {
         for (Entity entity : entities) {
-            Entity target = Mappers.targetM.get(entity).target;
+            Destination destination = Mappers.destinationM.get(entity);
 
-            if(target == null){
-                entity.remove(Target.class);
-                continue;
-            }
+            int destX = destination.x;
+            int destY = destination.y;
 
-            Position targetPosition = Mappers.positionM.get(target);
             Position ownPosition = Mappers.positionM.get(entity);
 
             //System.out.println(Mappers.nameM.get(entity).name+" is trying to follow "+Mappers.nameM.get(target).name);
 
             //FIXME is this the most efficient way
-            float deltaX = targetPosition.x - ownPosition.x;
-            float deltaY = targetPosition.y - ownPosition.y;
+            float deltaX = destX - ownPosition.x;
+            float deltaY = destY - ownPosition.y;
 
             if(deltaX == 0 && deltaY == 0){
-                //Dont do anything if we are at target, without this we get divided by 0 errors in current implementation
+                //Destination has been reached give the entity a new destination
+                int direction = MathUtils.random(360);
+                int distance = MathUtils.random(100,200);
+                destination.x += (int) (MathUtils.cosDeg(direction)*distance);
+                destination.y += (int) (MathUtils.sinDeg(direction)*distance);
+                System.out.println("New destination of "+Mappers.nameM.get(entity).name+" is X:"+destination.x+" Y:"+destination.y);
+                //Start moving at next iteration
                 continue;
             }
 
@@ -57,15 +59,19 @@ public class AIFollowEntitySystem extends EntitySystem implements EntityListener
             //FIXME this clamping bugs when target is reached
             if(movementX > 0 && movementX > deltaX){
                 movementX = deltaX;
+                System.out.println(movementX);
             }
             if(movementX < 0 && movementX < deltaX){
                 movementX = deltaX;
+                System.out.println(movementX);
             }
             if(movementY > 0 && movementY > deltaY){
                 movementY = deltaY;
+                System.out.println(movementY);
             }
             if(movementY < 0 && movementY < deltaY){
                 movementY = deltaY;
+                System.out.println(movementY);
             }
 
             ownPosition.x += movementX;
@@ -79,7 +85,7 @@ public class AIFollowEntitySystem extends EntitySystem implements EntityListener
         //FIXME can i somehow use ImmutableArray instead of Vector
         ImmutableArray<Entity> immutableEntities = engine.getEntitiesFor(family);
         for(Entity e : immutableEntities){
-            System.out.println("Entity (" + Mappers.nameM.get(e).name + ") added to AIFollow");
+            System.out.println("Entity (" + Mappers.nameM.get(e).name + ") added to AIMoveToDestination");
             entities.add(e);
         }
     }
@@ -91,13 +97,13 @@ public class AIFollowEntitySystem extends EntitySystem implements EntityListener
 
     @Override
     public void entityAdded(Entity entity) {
-        System.out.println(Mappers.nameM.get(entity).name + " has been given a target.");
+        System.out.println(Mappers.nameM.get(entity).name + " has been given a destination.");
         entities.add(entity);
     }
 
     @Override
     public void entityRemoved(Entity entity) {
-        System.out.println(Mappers.nameM.get(entity).name + " has lost its target.");
+        System.out.println(Mappers.nameM.get(entity).name + " has lost its destination.");
         entities.remove(entity);
     }
 }

@@ -1,6 +1,7 @@
 package core;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import components.server.Destination;
 import components.server.Target;
 import components.shared.*;
 
@@ -15,4 +16,5 @@ public class Mappers {
     public static final ComponentMapper<Player> playerM = getFor(Player.class);
     public static final ComponentMapper<TileID> tileidM = getFor(TileID.class);
     public static final ComponentMapper<Target> targetM = getFor(Target.class);
+    public static final ComponentMapper<Destination> destinationM = getFor(Destination.class);
 }

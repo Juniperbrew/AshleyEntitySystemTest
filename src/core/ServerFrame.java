@@ -8,9 +8,11 @@ import java.util.*;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.MathUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import components.server.Destination;
 import components.server.Target;
 import components.shared.*;
 import gui.TestAbstract;
@@ -21,6 +23,7 @@ import network.Network.Spawn;
 import network.Network.GoToMap;
 import network.Network.*;
 import systems.AIFollowEntitySystem;
+import systems.AIMoveToDestinationSystem;
 import systems.AIRandomMovementSystem;
 
 import javax.swing.*;
@@ -197,6 +200,9 @@ public class ServerFrame extends TestAbstract<String>{
 	@Override
 	protected boolean parseCommand(String input){
 
+		if(input.length() == 0){
+			return true;
+		}
 		//If input is not a command we send it as a message to all clients
 		if(input.charAt(0) != '!'){
 			Message message = new Message();
@@ -231,10 +237,19 @@ public class ServerFrame extends TestAbstract<String>{
 					Entity newEntity = new Entity();
 					newEntity.add(new Name(scn.next()));
 					newEntity.add(new MapName((scn.next())));
-					newEntity.add(new Position(scn.nextFloat(),scn.nextFloat()));
+					Position position = new Position(scn.nextFloat(),scn.nextFloat());
+					newEntity.add(position);
 					if(scn.hasNext()) {
 						Target target = new Target(worldData.getEntityWithID(scn.nextLong()));
 						newEntity.add(target);
+					}else{
+						Destination destination = new Destination((int)position.x,(int)position.y);
+						int direction = MathUtils.random(360);
+						int distance = MathUtils.random(100,200);
+						destination.x += (int) (MathUtils.cosDeg(direction)*distance);
+						destination.y += (int) (MathUtils.sinDeg(direction)*distance);
+						System.out.println("New destination of "+newEntity.getComponent(Name.class).name+" is X:"+destination.x+" Y:"+destination.y);
+						newEntity.add(destination);
 					}
 					worldData.addEntity(newEntity);
 				}catch(InputMismatchException e){
@@ -319,6 +334,10 @@ public class ServerFrame extends TestAbstract<String>{
 					//Don't send server only components
 					continue;
 				}
+				if(component instanceof Destination){
+					//Don't send server only components
+					continue;
+				}
 				updatedComponents.add(component);
 			}
 			Component[] componentsArray = updatedComponents.toArray(new Component[updatedComponents.size()]);
@@ -392,10 +411,13 @@ public class ServerFrame extends TestAbstract<String>{
 	private void loadWorld(String mapName){
 		clearEntities();
 		worldData = WorldLoader.loadWorld(mapName);
-		worldData.addSystem(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class).get()));
+		worldData.addSystem(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class,Destination.class).get()));
 		AIFollowEntitySystem aiFollowEntitySystem = new AIFollowEntitySystem(Family.all(Target.class).get());
 		worldData.addFamilyListener(Family.all(Target.class).get(), aiFollowEntitySystem);
 		worldData.addSystem(aiFollowEntitySystem);
+		AIMoveToDestinationSystem aiMoveToDestinationSystem = new AIMoveToDestinationSystem(Family.all(Destination.class).get());
+		worldData.addFamilyListener(Family.all(Destination.class).get(), aiMoveToDestinationSystem);
+		worldData.addSystem(aiMoveToDestinationSystem);
 	}
 
 	@Override
