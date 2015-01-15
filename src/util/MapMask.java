@@ -30,6 +30,11 @@ public class MapMask {
         int gridX = x / Global.TILE_SIZE;
         int gridY = invertedY / Global.TILE_SIZE;
 
+        if(gridX < 0 || gridY < 0 || gridX >= width || gridY >= height){
+            //Collide at map borders
+            return true;
+        }
+
         return mask[gridY][gridX];
     }
 

@@ -51,7 +51,7 @@ public class ClientFrame extends TestAbstract<String>{
 			client = new Client(writeBufferSize,objectBufferSize);
 			Network.register(client);
 			client.start();
-			client.connect(5000, "127.0.0.1", Network.port);
+			client.connect(5000, "127.0.0.1", Network.portTCP);
 
 			client.addListener(new Listener(){
 				public void received (Connection connection, Object object) {

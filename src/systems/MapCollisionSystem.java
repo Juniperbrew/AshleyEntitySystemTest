@@ -3,8 +3,10 @@ package systems;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import components.server.Destination;
 import components.server.Movement;
 import components.shared.Bounds;
+import components.shared.Name;
 import components.shared.Position;
 import core.Global;
 import core.Mappers;
@@ -41,6 +43,7 @@ public class MapCollisionSystem extends ListeningEntitySystem {
         Position pos = Mappers.positionM.get(entity);
         Bounds bounds = Mappers.boundsM.get(entity);
         Position newPos = new Position(pos.x+delta.deltaX,pos.y+delta.deltaY);
+        boolean collided = false;
 
         //FIXME Is it enough to use the midpoints of each side as collision point?
         //Find mid point on left and right side of collision box and check if they are inside a tile
@@ -49,11 +52,19 @@ public class MapCollisionSystem extends ListeningEntitySystem {
             delta.deltaX = 0;
             //FIXME reverting move should cause jittering when colliding?
             newPos.x = pos.x;
+            collided = true;
         }
         //Find mid point on top and bottom side of collision box and check if they are inside a tile
         if((delta.deltaY > 0 && collides((int)newPos.x+(bounds.width/2),(int)newPos.y+bounds.height))
                 || (delta.deltaY < 0 && collides((int)newPos.x +(bounds.width/2),(int)newPos.y))){
             delta.deltaY = 0;
+            collided = true;
+        }
+        if(collided){
+            Destination destination = Mappers.destinationM.get(entity);
+            if(destination!=null){
+                AIMoveToDestinationSystem.giveNewDestination(entity);
+            }
         }
     }
 

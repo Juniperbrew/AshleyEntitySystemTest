@@ -21,10 +21,11 @@ public abstract class TestAbstract<E> {
 	int sleepTime = 500;
 	int tickRate = 20;
 	boolean lockTickRate = true;
-	private long tickStartTime;
-	long deltaNano;
-	double cumulativeTimingErrorMilli;
-	double sleepErrorMilli;
+	private long tickStartTime = 0;
+	private long deltaNano;
+	private double cumulativeTimingErrorMilli;
+	private double sleepErrorMilli;
+	long tickDeltaNano;
 	
 	//Logging
 	int loopCounter = 0;
@@ -103,7 +104,14 @@ public abstract class TestAbstract<E> {
 		//System.setOut(new PrintStream(out, true));
 	}
 
+	public long getDelta(){
+		return tickDeltaNano;
+	}
 
+
+	public int getLoopsPerSecond(){
+		return loopsPerSecond;
+	}
 
 	protected void startLogicLoop(){
 
@@ -112,7 +120,11 @@ public abstract class TestAbstract<E> {
 			@Override
 			public void run() {
 				while(true){
+					if(tickStartTime > 0){
+						tickDeltaNano = System.nanoTime()-tickStartTime;
+					}
 					tickStartTime = System.nanoTime();
+
 					loopCounter++;
 					loopsPerSecondCounter++;
 
@@ -123,8 +135,6 @@ public abstract class TestAbstract<E> {
 						deltaNanoTotalPerSecond = deltaNanoTotalPerSecondCounter;
 						loopsPerSecondCounter = 0;
 						deltaNanoTotalPerSecondCounter = 0;
-
-
 
 						//Allow subclasses to run their own logging every second
 						oneSecondElapsed();

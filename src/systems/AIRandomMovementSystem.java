@@ -10,17 +10,12 @@ import core.Mappers;
 
 import java.util.Random;
 
-public class AIRandomMovementSystem extends IteratingSystem {
+public class AIRandomMovementSystem extends ListeningEntitySystem {
 
     Random rng;
 
     public AIRandomMovementSystem(Family family) {
         super(family);
-        rng = new Random();
-    }
-
-    public  AIRandomMovementSystem (Family family, int priority) {
-        super(family, priority);
         rng = new Random();
     }
 

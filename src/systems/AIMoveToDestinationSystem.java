@@ -14,90 +14,61 @@ import java.util.Vector;
 /**
  * Created by Juniperbrew on 12.1.2015.
  */
-public class AIMoveToDestinationSystem extends EntitySystem implements EntityListener {
+public class AIMoveToDestinationSystem extends ListeningEntitySystem {
 
-    private Family family;
-    private float speed = 5; //pixels per sec
-    Vector<Entity> entities;
+    private float speed = 75; //pixels per sec
+
     public AIMoveToDestinationSystem(Family family) {
-        this.family = family;
-        entities = new Vector<>();
+        super(family);
     }
 
     @Override
-    public void update (float deltaTime) {
-        for (Entity entity : entities) {
-            Destination destination = Mappers.destinationM.get(entity);
+    protected void processEntity(Entity entity, float deltaTime) {
+        Destination destination = Mappers.destinationM.get(entity);
 
-            int destX = destination.x;
-            int destY = destination.y;
+        int destX = destination.x;
+        int destY = destination.y;
 
-            Position ownPosition = Mappers.positionM.get(entity);
+        Position ownPosition = Mappers.positionM.get(entity);
 
-            //System.out.println(Mappers.nameM.get(entity).name+" is trying to follow "+Mappers.nameM.get(target).name);
+        //FIXME is this the most efficient way
+        float deltaX = destX - ownPosition.x;
+        float deltaY = destY - ownPosition.y;
 
-            //FIXME is this the most efficient way
-            float deltaX = destX - ownPosition.x;
-            float deltaY = destY - ownPosition.y;
+        if(deltaX == 0 && deltaY == 0){
+            //Destination has been reached give the entity a new destination
+            giveNewDestination(entity);
+            //Start moving at next iteration
+            return;
+        }
 
-            if(deltaX == 0 && deltaY == 0){
-                //Destination has been reached give the entity a new destination
-                int direction = MathUtils.random(360);
-                int distance = MathUtils.random(100,200);
-                destination.x += (int) (MathUtils.cosDeg(direction)*distance);
-                destination.y += (int) (MathUtils.sinDeg(direction)*distance);
-                System.out.println("New destination of "+Mappers.nameM.get(entity).name+" is X:"+destination.x+" Y:"+destination.y);
-                //Start moving at next iteration
-                continue;
-            }
+        float distanceMoved = speed*deltaTime;
+        float fullDistance = (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
 
-            float distanceMoved = speed*deltaTime;
-            float fullDistance = (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
+        Movement movement = Mappers.movementM.get(entity);
+        movement.deltaX = (deltaX*distanceMoved)/fullDistance;
+        movement.deltaY = (deltaY*distanceMoved)/fullDistance;
 
-            Movement movement = Mappers.movementM.get(entity);
-            movement.deltaX = (deltaX*distanceMoved)/fullDistance;
-            movement.deltaY = (deltaY*distanceMoved)/fullDistance;
-
-            if(movement.deltaX > 0 && movement.deltaX > deltaX){
-                movement.deltaX = deltaX;
-            }
-            if(movement.deltaX < 0 && movement.deltaX < deltaX){
-                movement.deltaX = deltaX;
-            }
-            if(movement.deltaY > 0 && movement.deltaY > deltaY){
-                movement.deltaY = deltaY;
-            }
-            if(movement.deltaY < 0 && movement.deltaY < deltaY){
-                movement.deltaY = deltaY;
-            }
+        if(movement.deltaX > 0 && movement.deltaX > deltaX){
+            movement.deltaX = deltaX;
+        }
+        if(movement.deltaX < 0 && movement.deltaX < deltaX){
+            movement.deltaX = deltaX;
+        }
+        if(movement.deltaY > 0 && movement.deltaY > deltaY){
+            movement.deltaY = deltaY;
+        }
+        if(movement.deltaY < 0 && movement.deltaY < deltaY){
+            movement.deltaY = deltaY;
         }
     }
 
-
-    @Override
-    public void addedToEngine (Engine engine) {
-        //FIXME can i somehow use ImmutableArray instead of Vector
-        ImmutableArray<Entity> immutableEntities = engine.getEntitiesFor(family);
-        for(Entity e : immutableEntities){
-            System.out.println("Entity (" + Mappers.nameM.get(e).name + ") added to AIMoveToDestination");
-            entities.add(e);
-        }
-    }
-
-    @Override
-    public void removedFromEngine (Engine engine) {
-        entities.clear();
-    }
-
-    @Override
-    public void entityAdded(Entity entity) {
-        System.out.println(Mappers.nameM.get(entity).name + " has been given a destination.");
-        entities.add(entity);
-    }
-
-    @Override
-    public void entityRemoved(Entity entity) {
-        System.out.println(Mappers.nameM.get(entity).name + " has lost its destination.");
-        entities.remove(entity);
+    public static void giveNewDestination(Entity e){
+        Destination dest = Mappers.destinationM.get(e);
+        Position pos = Mappers.positionM.get(e);
+        int direction = MathUtils.random(360);
+        int distance = MathUtils.random(100,200);
+        dest.x = (int) (pos.x+MathUtils.cosDeg(direction)*distance);
+        dest.y = (int) (pos.y+MathUtils.sinDeg(direction)*distance);
     }
 }

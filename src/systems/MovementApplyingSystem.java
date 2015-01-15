@@ -12,9 +12,8 @@ import core.Mappers;
 /**
  * Created by Juniperbrew on 14.1.2015.
  */
-public class MovementApplyingSystem extends IteratingSystem {
+public class MovementApplyingSystem extends ListeningEntitySystem {
 
-    Engine engine;
     public MovementApplyingSystem(Family family) {
         super(family);
     }
@@ -27,17 +26,7 @@ public class MovementApplyingSystem extends IteratingSystem {
         position.x += movement.deltaX;
         position.y += movement.deltaY;
 
-        /*if (Mappers.targetM.get(entity) != null) {
-            System.out.println(Mappers.nameM.get(entity).name + "> Dx:" + movement.deltaX + " Dy:" + movement.deltaY + " DeltaTime:" + deltaTime);
-        }*/
-
         movement.deltaX = 0;
         movement.deltaY = 0;
-    }
-
-    public void addedToEngine (Engine engine) {
-        super.addedToEngine(engine);
-        this.engine = engine;
-        System.out.println(this.toString()+" added to "+engine.toString());
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import components.server.Destination;
 import components.server.Movement;
 import components.shared.Bounds;
 import components.shared.Position;
@@ -42,11 +43,21 @@ public class EntityCollisionSystem extends ListeningEntitySystem {
             Bounds eBounds = Mappers.boundsM.get(e);
             Rectangle eRect = new Rectangle(ePosition.x,ePosition.y,eBounds.width,eBounds.height);
             Rectangle intersection = new Rectangle();
+            boolean collided = false;
             if(Intersector.intersectRectangles(eRect, playerRectXMovement, intersection)) {
                 movement.deltaX = 0;
+                collided = true;
             }
             if(Intersector.intersectRectangles(eRect,playerRectYMovement, intersection)) {
                 movement.deltaY = 0;
+                collided = true;
+            }
+
+            if(collided){
+                Destination destination = Mappers.destinationM.get(entity);
+                if(destination!=null){
+                    AIMoveToDestinationSystem.giveNewDestination(entity);
+                }
             }
         }
     }

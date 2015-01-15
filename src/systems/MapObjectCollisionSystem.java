@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import components.server.Destination;
 import components.server.Movement;
 import components.shared.Bounds;
 import components.shared.Position;
@@ -33,6 +34,7 @@ public class MapObjectCollisionSystem extends ListeningEntitySystem {
         Bounds bounds = Mappers.boundsM.get(entity);
         Rectangle playerRectXMovement = new Rectangle(position.x+movement.deltaX, position.y, bounds.width, bounds.height);
         Rectangle playerRectYMovement = new Rectangle(position.x, position.y+movement.deltaY, bounds.width, bounds.height);
+        boolean collided = false;
 
         //We only support rectangle objects so this will hopefully crash if we find any other object
         for(MapObject object : objects){
@@ -43,10 +45,18 @@ public class MapObjectCollisionSystem extends ListeningEntitySystem {
                 Rectangle intersection = new Rectangle();
                 if(Intersector.intersectRectangles(objRect, playerRectXMovement, intersection)) {
                     movement.deltaX = 0;
+                    collided = true;
                 }
                 if(Intersector.intersectRectangles(objRect,playerRectYMovement, intersection)) {
                     movement.deltaY = 0;
+                    collided = true;
                 }
+            }
+        }
+        if(collided){
+            Destination destination = Mappers.destinationM.get(entity);
+            if(destination!=null){
+                AIMoveToDestinationSystem.giveNewDestination(entity);
             }
         }
     }

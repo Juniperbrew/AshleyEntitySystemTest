@@ -3,9 +3,11 @@ package core;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.maps.MapObjects;
+import components.server.Destination;
 import components.server.Movement;
 import components.server.Target;
 import components.shared.*;
+import systems.ListeningEntitySystem;
 import tiled.core.*;
 import tiled.core.Map;
 import util.EntityToString;
@@ -18,9 +20,6 @@ public class WorldData implements EntityListener {
     public HashMap<String,Map> allMaps;
     public HashMap<Long,Entity> entityIDs;
     public HashMap<String,Vector<Entity>> entitiesInMaps;
-    public Vector<String> playerList;
-
-    //FIXME simulate each map on their own engine
     private HashMap<String,Engine> allEngines;
 
     private long networkIDCounter;
@@ -35,7 +34,10 @@ public class WorldData implements EntityListener {
         this.allMaps = allMaps;
         entitiesInMaps = new HashMap<>();
         entityIDs = new HashMap<>();
-        playerList = new Vector<>();
+    }
+
+    public boolean hasMap(String mapName){
+        return allMaps.keySet().contains(mapName);
     }
 
     public Set<String> getAllMapNames(){
@@ -62,6 +64,23 @@ public class WorldData implements EntityListener {
         for(Engine engine : allEngines.values()){
             engine.addSystem(system);
         }
+    }
+
+    public void toggleAllSystemsOnMap(String mapName, boolean enabled){
+        for(EntitySystem system:allEngines.get(mapName).getSystems()){
+            system.setProcessing(enabled);
+        }
+        System.out.println((enabled?"Enabled ":"Disabled ")+" all systems on map "+mapName);
+    }
+
+    public void toggleSystemOnMap(int index, String mapName){
+        EntitySystem system = allEngines.get(mapName).getSystems().get(index);
+        if(system == null){
+            System.out.println("No system with index "+index+" in map "+mapName);
+            return;
+        }
+        system.setProcessing(!system.checkProcessing());
+        System.out.println(system+" is now "+(system.checkProcessing()?" enabled.":" disabled."));
     }
 
     public LinkedList<MapObject> getObjectsFromMap(String mapName){
@@ -129,6 +148,7 @@ public class WorldData implements EntityListener {
         }
         return entitiesAsString;
     }
+
 
     public void updateEntitiesInAllMaps(HashMap<Long,Component[]> updatedEntities){
         System.out.println("Updating all maps");
@@ -250,6 +270,7 @@ public class WorldData implements EntityListener {
         newEntity.add(new MapName(mapName));
         //Y axis needs to be inverted because tiled map editor has origo in top left
         newEntity.add(new Position(obj.getX(), mapHeightPixels-obj.getY()-obj.getHeight()));
+        newEntity.add(new Destination(obj.getX(), mapHeightPixels-obj.getY()-obj.getHeight()));
 
         if(entityProperties.containsKey("health")){
             int health = Integer.parseInt(entityProperties.getProperty("health"));
@@ -313,16 +334,45 @@ public class WorldData implements EntityListener {
         allEngines.get(mapName).addEntityListener(family,listener);
     }
 
+    public void dumpData(){
+
+        /*
+        public HashMap<String,Map> allMaps;
+        public HashMap<Long,Entity> entityIDs;
+        private long networkIDCounter;*/
+
+        System.out.println("-----------------------------------------");
+        for(String mapName : allEngines.keySet()){
+            Engine engine = allEngines.get(mapName);
+            System.out.println("#"+mapName+": "+engine);
+            ImmutableArray<EntitySystem> systems = engine.getSystems();
+            for (int i = 0; i < systems.size(); i++) {
+                EntitySystem system = systems.get(i);
+                System.out.println("  "+i+"#"+system+": "+system.checkProcessing());
+                if(system instanceof ListeningEntitySystem){
+                    ListeningEntitySystem s = (ListeningEntitySystem) system;
+                    for(Entity e:s.getEntities()){
+                        System.out.println("    >"+EntityToString.convert(e));
+                    }
+                }
+            }
+        }
+        System.out.println();
+        for(String mapName:entitiesInMaps.keySet()){
+            Vector<Entity> entities = entitiesInMaps.get(mapName);
+            System.out.println("Map:"+mapName);
+            for(Entity e:entities){
+                System.out.println(">"+EntityToString.convert(e));
+            }
+        }
+        System.out.println("-----------------------------------------");
+    }
+
 	@Override
 	public void entityAdded(Entity entity) {
         //FIXME i probably want separate listeners for each engine
         String map = Mappers.mapM.get(entity).map;
         System.out.println("Added " + EntityToString.convert(entity) + " to map " + map);
-
-        //If entity is player we add his name to playerlist
-        if(entity.getComponent(Player.class) != null){
-            playerList.add(Mappers.nameM.get(entity).name);
-        }
 
         entityIDs.put(Mappers.networkidM.get(entity).id, entity);
 
@@ -355,11 +405,6 @@ public class WorldData implements EntityListener {
 
         //Remove from id list
         entityIDs.remove(Mappers.networkidM.get(entity).id);
-
-        //If entity is player we remove him from playerlist
-        if(entity.getComponent(Player.class) != null){
-            playerList.remove(Mappers.nameM.get(entity).name);
-        }
 
         if(entitiesInMaps.get(map) == null){
             System.out.println("Tried to remove entity from a map that isn't listed this shouldnt happen");

@@ -9,7 +9,6 @@ import java.util.LinkedList;
 /**
  * Created by Juniperbrew on 14.1.2015.
  */
-//FIXME Make all listening systems extend this
 public abstract class ListeningEntitySystem extends EntitySystem implements EntityListener{
 
     private LinkedList<Entity> entities;
@@ -53,6 +52,10 @@ public abstract class ListeningEntitySystem extends EntitySystem implements Enti
     public void removedFromEngine (Engine engine) {
         entities.clear();
         System.out.println(this + " removed from engine.");
+    }
+
+    public LinkedList<Entity> getEntities () {
+        return entities;
     }
 
     protected abstract void processEntity (Entity entity, float deltaTime);

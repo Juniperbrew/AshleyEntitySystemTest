@@ -36,6 +36,7 @@ public class ServerFrame extends TestAbstract<String>{
 	int syncsSentPerSecondCounter = 0;
 
 	boolean autoSync = true;
+	boolean useUDP = false;
 
 	final int writeBufferSize = 16384; //default 16384
 	final int objectBufferSize = 4096; //default 2048
@@ -45,6 +46,11 @@ public class ServerFrame extends TestAbstract<String>{
 	//##GAME DATA
 	WorldData worldData;
 	HashMap<Connection,Entity> playerList;
+
+	//##Logging
+	long tickStartTime;
+	long syncDurationCounter;
+	long updateDurationCounter;
 
 	public ServerFrame(){
 		super();
@@ -72,8 +78,7 @@ public class ServerFrame extends TestAbstract<String>{
 
 			Network.register(server);
 			server.start();
-			server.bind(Network.port);
-
+			server.bind(Network.portTCP, Network.portUDP);
 
 			server.addListener(new Listener(){
 				public void connected (Connection connection) {
@@ -91,6 +96,7 @@ public class ServerFrame extends TestAbstract<String>{
 				public void received (Connection connection, Object object) {
 					if (object instanceof Register) {
 						Register register = (Register) object;
+						infoFrame.addLogLine(connection+"Registered name " + register.connectionName);
 						connection.setName(register.connectionName);
 					} else if (object instanceof Message) {
 						Message message = (Message)object;
@@ -113,8 +119,15 @@ public class ServerFrame extends TestAbstract<String>{
 						}
 					}else if (object instanceof Spawn) {
 						Spawn spawn = (Spawn) object;
-						infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
-
+						if(!worldData.hasMap(spawn.mapName)){
+							infoFrame.addLogLine(connection+" tried to spawn in non existing map:"+spawn.mapName);
+							Message message = new Message();
+							message.text = ("SERVER: Map "+spawn.mapName+" does not exist on server");
+							connection.sendTCP(message);
+							return;
+						}else{
+							infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
+						}
 						//We ignore the coordinates the client sent and make up our own
 						int x = 322;
 						int y = 322;
@@ -235,6 +248,38 @@ public class ServerFrame extends TestAbstract<String>{
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("autosync command needs 1 argument");
 				}
+			}else if(command.equals("udp")){
+				commandParsed = true;
+				try{
+					useUDP = scn.nextBoolean();
+					infoFrame.addLogLine("Now autosyncing with " + (useUDP ? "UDP." : "TCP."));
+				}catch(InputMismatchException e){
+					infoFrame.addLogLine("argument needs to be boolean");
+				}catch(NoSuchElementException e){
+					infoFrame.addLogLine("udp command needs 1 argument");
+				}
+			}else if(command.equals("togglesystem")){
+				commandParsed = true;
+				try{
+					String mapName = scn.next();
+					int index = scn.nextInt();
+					worldData.toggleSystemOnMap(index, mapName);
+				}catch(InputMismatchException e){
+					infoFrame.addLogLine("argument 2 needs to be integer");
+				}catch(NoSuchElementException e){
+					infoFrame.addLogLine("togglesystem command needs 2 arguments");
+				}
+			}else if(command.equals("toggleallsystems")){
+				commandParsed = true;
+				try{
+					String mapName = scn.next();
+					boolean enabled = scn.nextBoolean();
+					worldData.toggleAllSystemsOnMap(mapName,enabled);
+				}catch(InputMismatchException e){
+					infoFrame.addLogLine("argument 2 needs to be integer");
+				}catch(NoSuchElementException e){
+					infoFrame.addLogLine("togglesystem command needs 2 arguments");
+				}
 			}else if(command.equals("add")){
 				commandParsed = true;
 				try{
@@ -307,11 +352,39 @@ public class ServerFrame extends TestAbstract<String>{
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("move command needs 3 arguments");
 				}
+			}else if(command.equals("teleport")){
+				commandParsed = true;
+				try{
+					long networkID = scn.nextLong();
+					int x = scn.nextInt();
+					int y = scn.nextInt();
+					Entity e = worldData.getEntityWithID(networkID);
+					Position pos = Mappers.positionM.get(e);
+					pos.x = x;
+					pos.y = y;
+
+					Message message = new Message();
+					message.text = ("SERVER: Teleporting "+Mappers.nameM.get(e).name+" to X:"+x+" Y:"+y);
+					infoFrame.addLogLine("Teleporting "+Mappers.nameM.get(e).name+" to X:"+x+" Y:"+y);
+					server.sendToAllTCP(message);
+
+				}catch(InputMismatchException e){
+					infoFrame.addLogLine("arguments needs to be integers");
+				}catch(NoSuchElementException e){
+					infoFrame.addLogLine("move command needs 3 arguments");
+				}
 			}else if(command.equals("loadworld")){
 				commandParsed = true;
 				try{
 					String mapName = scn.next();
 					loadWorld(mapName);
+					//Despawn all clients
+					Spawn despawn = new Spawn();
+					despawn.networkID = -1;
+					server.sendToAllTCP(despawn);
+					Message message = new Message();
+					message.text = "SERVER: Loaded a new world "+mapName+" all clients have been despawned";
+					server.sendToAllTCP(message);
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("argument needs to be a String");
 				}catch(NoSuchElementException e){
@@ -335,10 +408,10 @@ public class ServerFrame extends TestAbstract<String>{
 		//Empty list mapping connections to player entities
 		playerList.clear();
 
-		//Send all clients an empty sync update
-		SyncEntities sync = new SyncEntities();
-		sync.entities = new HashMap<>();
-		server.sendToAllTCP(sync);
+		//Despawn all players
+		Spawn despawn = new Spawn();
+		despawn.networkID = -1;
+		server.sendToAllTCP(despawn);
 
 		infoFrame.addLogLine("Entities cleared");
 	}
@@ -396,7 +469,11 @@ public class ServerFrame extends TestAbstract<String>{
 			playerNameList.add(getPlayerName(c));
 		}
 		syncPlayerList.playerList = playerNameList;
-		connection.sendTCP(syncPlayerList);
+		if(useUDP){
+			connection.sendUDP(syncPlayerList);
+		}else{
+			connection.sendTCP(syncPlayerList);
+		}
 
 		//If player has spawned we sync entities
 		if(playerList.get(connection) != null) {
@@ -413,10 +490,12 @@ public class ServerFrame extends TestAbstract<String>{
 
 	@Override
 	protected void doLogic() {
+		tickStartTime = System.nanoTime();
 
 		//Auto sync clients	
 		if(autoSync){
 			for(Connection connection : server.getConnections()){
+
 				//FIXME Sync only when writebuffer is empty this removes all bufferoverflows and keeps syncrate the same, TcpIdleSender alternative solution which caused much more lag
 				if(connection.getTcpWriteBufferSize() == 0){
 					sync(connection);
@@ -427,19 +506,21 @@ public class ServerFrame extends TestAbstract<String>{
 			syncsSent++;
 			syncsSentPerSecondCounter++;
 		}
-		//FIXME use delta time here instead of absolute 1 second
-		worldData.updateWorld(1,"untitled.tmx");
-		//worldData.updateAllWorlds(1);
+		long syncDuration = System.nanoTime()-tickStartTime;
+		syncDurationCounter += syncDuration;
+
+		worldData.updateAllWorlds(getDelta() / 1000000000f);
+		updateDurationCounter += System.nanoTime()-tickStartTime-syncDuration;
+
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				infoFrame.setListItems(worldData.getEntitiesAsString());
-
 				updateSpecificInfo();
 			}
-			});
+		});
 
-		}
+	}
 
 	private void loadWorld(String mapName){
 		clearEntities();
@@ -449,7 +530,7 @@ public class ServerFrame extends TestAbstract<String>{
 
 		for(String map :worldData.getAllMapNames()){
 
-			worldData.addSystemToMap(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class, Destination.class, Player.class).get()), map);
+			//worldData.addSystemToMap(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class, Destination.class, Player.class).get()), map);
 
 			AIFollowEntitySystem aiFollowEntitySystem = new AIFollowEntitySystem(Family.all(Target.class).get());
 			worldData.addFamilyListenerToEngine(Family.all(Target.class).get(), aiFollowEntitySystem, map);
@@ -468,11 +549,13 @@ public class ServerFrame extends TestAbstract<String>{
 			worldData.addSystemToMap(mapObjectCollisionSystem, map);
 
 			EntityCollisionSystem entityCollisionSystem = new EntityCollisionSystem(Family.all(Movement.class).exclude(Player.class).get(),worldData,map);
-			worldData.addFamilyListenerToEngine(Family.all(Movement.class).get(), entityCollisionSystem,map);
+			worldData.addFamilyListenerToEngine(Family.all(Movement.class).exclude(Player.class).get(), entityCollisionSystem,map);
 			worldData.addSystemToMap(entityCollisionSystem,map);
 
 			MovementApplyingSystem movementApplyingSystem = new MovementApplyingSystem(Family.all(Movement.class).get());
+			worldData.addFamilyListenerToEngine(Family.all(Movement.class).get(),movementApplyingSystem,map);
 			worldData.addSystemToMap(movementApplyingSystem,map);
+
 		}
 	}
 
@@ -489,8 +572,15 @@ public class ServerFrame extends TestAbstract<String>{
 
 	@Override
 	protected void oneSecondElapsed() {
+		worldData.dumpData();
 		syncsSentPerSecond = syncsSentPerSecondCounter;
-		syncsSentPerSecondCounter = 0;
+		if(getLoopsPerSecond()>0) {
+			System.out.println("Average sync duration per second:" + (syncDurationCounter / getLoopsPerSecond()) / 1000f+"us");
+			System.out.println("Average update duration per second:" + (updateDurationCounter / getLoopsPerSecond()) / 1000f+"us");
+		}
+		syncDurationCounter=0;
+		updateDurationCounter=0;
+		syncsSentPerSecondCounter=0;
 	}
 }
 
