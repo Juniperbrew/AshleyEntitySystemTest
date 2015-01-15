@@ -31,6 +31,9 @@ public abstract class TestAbstract<E> {
 	int loopsPerSecond = 0;
 	int loopsPerSecondCounter = 0;
 	long secondStartTime;
+	long deltaNanoTotalPerSecond;
+	long deltaNanoTotalPerSecondCounter;
+	long deltaNanoTotal;
 	
 	//Logging levels will cause a lot of lag with gui logging and log levels above info
 	final static boolean GUI_LOGGING = true;
@@ -97,7 +100,7 @@ public abstract class TestAbstract<E> {
 
 		//Exceptions still output in console
 		//FIXME Find way to output both in console and GUI
-		System.setOut(new PrintStream(out, true));
+		//System.setOut(new PrintStream(out, true));
 	}
 
 
@@ -117,7 +120,11 @@ public abstract class TestAbstract<E> {
 					if(System.nanoTime() - secondStartTime > 1000000000){
 						secondStartTime = System.nanoTime();
 						loopsPerSecond = loopsPerSecondCounter;
+						deltaNanoTotalPerSecond = deltaNanoTotalPerSecondCounter;
 						loopsPerSecondCounter = 0;
+						deltaNanoTotalPerSecondCounter = 0;
+
+
 
 						//Allow subclasses to run their own logging every second
 						oneSecondElapsed();
@@ -143,6 +150,8 @@ public abstract class TestAbstract<E> {
 	private void lockTickRate(int tickRate) throws InterruptedException{
 		double timePerTickNano = 1000000000f/tickRate;
 		deltaNano = System.nanoTime() - tickStartTime;
+		deltaNanoTotalPerSecondCounter += deltaNano;
+		deltaNanoTotal += deltaNano;
 		//infoFrame.addInfoLine("Target full tick duration: " + timePerTickNano/1000000f);
 		//infoFrame.addInfoLine("Tick duration: " + String.valueOf(deltaNano/1000000f));
 		double sleepDurationMilli = ((timePerTickNano - deltaNano)/1000000f)+cumulativeTimingErrorMilli;
@@ -189,9 +198,11 @@ public abstract class TestAbstract<E> {
 		int freeMemory = (int) (r.freeMemory()/1000000);
 		int totalMemory = (int) (r.totalMemory()/1000000);
 
+		long averageDeltaPerSecond = deltaNanoTotalPerSecond/loopsPerSecond;
+
 		infoFrame.setGeneralInfoText("Loops: " + loopCounter + " Thread sleep: " + sleepTime + "ms Loops/s: " + loopsPerSecond  
 				+ " Max memory: " + maxMemory + " Free memory: " + freeMemory + " Total memory: " + totalMemory 
-			 + " Delta: " + (deltaNano/1000.0)+ "us" );
+			 + " Delta: " + (averageDeltaPerSecond/1000.0)+ "us Average looptime:"+(deltaNanoTotal /(loopCounter*1000))+"us");
 	}
 
 	protected boolean parseCommand(String input){

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.MathUtils;
 import components.server.Destination;
+import components.server.Movement;
 import components.server.Target;
 import components.shared.Position;
 import core.Mappers;
@@ -53,29 +54,22 @@ public class AIMoveToDestinationSystem extends EntitySystem implements EntityLis
             float distanceMoved = speed*deltaTime;
             float fullDistance = (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
 
-            float movementX = (deltaX*distanceMoved)/fullDistance;
-            float movementY = (deltaY*distanceMoved)/fullDistance;
+            Movement movement = Mappers.movementM.get(entity);
+            movement.deltaX = (deltaX*distanceMoved)/fullDistance;
+            movement.deltaY = (deltaY*distanceMoved)/fullDistance;
 
-            //FIXME this clamping bugs when target is reached
-            if(movementX > 0 && movementX > deltaX){
-                movementX = deltaX;
-                System.out.println(movementX);
+            if(movement.deltaX > 0 && movement.deltaX > deltaX){
+                movement.deltaX = deltaX;
             }
-            if(movementX < 0 && movementX < deltaX){
-                movementX = deltaX;
-                System.out.println(movementX);
+            if(movement.deltaX < 0 && movement.deltaX < deltaX){
+                movement.deltaX = deltaX;
             }
-            if(movementY > 0 && movementY > deltaY){
-                movementY = deltaY;
-                System.out.println(movementY);
+            if(movement.deltaY > 0 && movement.deltaY > deltaY){
+                movement.deltaY = deltaY;
             }
-            if(movementY < 0 && movementY < deltaY){
-                movementY = deltaY;
-                System.out.println(movementY);
+            if(movement.deltaY < 0 && movement.deltaY < deltaY){
+                movement.deltaY = deltaY;
             }
-
-            ownPosition.x += movementX;
-            ownPosition.y += movementY;
         }
     }
 

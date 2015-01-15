@@ -62,12 +62,11 @@ public class ClientFrame extends TestAbstract<String>{
 					}
 					if (object instanceof SyncEntities) {
 						final SyncEntities status = (SyncEntities)object;
-
 						SwingUtilities.invokeLater(new Runnable() {
 
 							@Override
 							public void run() {
-								worldData.updateEntities(status.entities);
+								worldData.updateEntitiesInAllMaps(status.entities);
 								//FIXME Dont update infoFrame if sync isn't changing anything
 								infoFrame.setListItems(worldData.getEntitiesAsString());
 							}
@@ -147,14 +146,13 @@ public class ClientFrame extends TestAbstract<String>{
 	@Override
 	protected void doLogic() {
 
-		//infoFrame.repaint();
 		updateSpecificInfo();
 	}
 
 	@Override
 	protected void initialize() {
 		startClient();
-		worldData = new WorldData(new Engine(), null);
+		worldData = new WorldData(null);
 	}
 
 	public static void main(String[] args){

@@ -38,6 +38,7 @@ public class Network {
 		kryo.register(TileID.class);
 		kryo.register(UpdateEntity.class);
 		kryo.register(UpdateComponent.class);
+		kryo.register(Bounds.class);
 	}
 
 	static public class SyncPlayerList{

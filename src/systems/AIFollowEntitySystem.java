@@ -3,6 +3,7 @@ package systems;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import components.server.Movement;
 import components.server.Target;
 import components.shared.NetworkID;
 import components.shared.Position;
@@ -34,8 +35,11 @@ public class AIFollowEntitySystem extends EntitySystem implements EntityListener
                 continue;
             }
 
+            //System.out.println("Moving "+Mappers.nameM.get(entity).name+" to target.");
+
             Position targetPosition = Mappers.positionM.get(target);
             Position ownPosition = Mappers.positionM.get(entity);
+            Movement movement = Mappers.movementM.get(entity);
 
             //System.out.println(Mappers.nameM.get(entity).name+" is trying to follow "+Mappers.nameM.get(target).name);
 
@@ -51,25 +55,21 @@ public class AIFollowEntitySystem extends EntitySystem implements EntityListener
             float distanceMoved = speed*deltaTime;
             float fullDistance = (float) Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
 
-            float movementX = (deltaX*distanceMoved)/fullDistance;
-            float movementY = (deltaY*distanceMoved)/fullDistance;
+            movement.deltaX = (deltaX*distanceMoved)/fullDistance;
+            movement.deltaY = (deltaY*distanceMoved)/fullDistance;
 
-            //FIXME this clamping bugs when target is reached
-            if(movementX > 0 && movementX > deltaX){
-                movementX = deltaX;
+            if(movement.deltaX > 0 && movement.deltaX > deltaX){
+                movement.deltaX = deltaX;
             }
-            if(movementX < 0 && movementX < deltaX){
-                movementX = deltaX;
+            if(movement.deltaX < 0 && movement.deltaX < deltaX){
+                movement.deltaX = deltaX;
             }
-            if(movementY > 0 && movementY > deltaY){
-                movementY = deltaY;
+            if(movement.deltaY > 0 && movement.deltaY > deltaY){
+                movement.deltaY = deltaY;
             }
-            if(movementY < 0 && movementY < deltaY){
-                movementY = deltaY;
+            if(movement.deltaY < 0 && movement.deltaY < deltaY){
+                movement.deltaY = deltaY;
             }
-
-            ownPosition.x += movementX;
-            ownPosition.y += movementY;
         }
     }
 

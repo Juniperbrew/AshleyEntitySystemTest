@@ -13,6 +13,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import components.server.Destination;
+import components.server.Movement;
 import components.server.Target;
 import components.shared.*;
 import gui.TestAbstract;
@@ -22,9 +23,7 @@ import network.Network.SyncEntities;
 import network.Network.Spawn;
 import network.Network.GoToMap;
 import network.Network.*;
-import systems.AIFollowEntitySystem;
-import systems.AIMoveToDestinationSystem;
-import systems.AIRandomMovementSystem;
+import systems.*;
 
 import javax.swing.*;
 
@@ -41,12 +40,11 @@ public class ServerFrame extends TestAbstract<String>{
 	final int writeBufferSize = 16384; //default 16384
 	final int objectBufferSize = 4096; //default 2048
 
+	final int TILE_SIZE = 32;
+
 	//##GAME DATA
 	WorldData worldData;
 	HashMap<Connection,Entity> playerList;
-
-	//Key is mapname, value is vector containing all entities in that map
-	//HashMap<String,Vector<Entity>> entities;
 
 	public ServerFrame(){
 		super();
@@ -85,7 +83,8 @@ public class ServerFrame extends TestAbstract<String>{
 				public void disconnected (Connection connection) {
 					Entity player = playerList.get(connection);
 					if(player != null){
-						worldData.removeEntity(player);
+						String mapName = Mappers.mapM.get(player).map;
+						worldData.removeEntity(player, mapName);
 						playerList.remove(connection);
 					}
 				}
@@ -126,8 +125,9 @@ public class ServerFrame extends TestAbstract<String>{
 						newPlayer.add(new Name(spawn.name));
 						newPlayer.add(new MapName(spawn.mapName));
 						newPlayer.add(new Position(x,y));
+						newPlayer.add(new Bounds(16,32));
 						newPlayer.add(new Player());
-						worldData.addEntity(newPlayer);
+						worldData.addEntity(newPlayer, spawn.mapName);
 
 						//We send the spawn packet back with the modified coordinates as confirmation to client
 						spawn.x = x;
@@ -175,6 +175,11 @@ public class ServerFrame extends TestAbstract<String>{
 						Entity entity = worldData.getEntityWithID(updateComponent.networkID);
 						Component updatedComponent = updateComponent.component;
 						if(updatedComponent instanceof Position){
+							//FIXME updating component on network thread
+							if(!playerList.get(connection).equals(entity)){
+								//We log each time the player updates something else than himself
+								infoFrame.addLogLine(connection + " updated position of "+Mappers.nameM.get(entity).name);
+							}
 							Position updatedPos = (Position) updatedComponent;
 							Position entityPos = entity.getComponent(Position.class);
 							entityPos.x = updatedPos.x;
@@ -182,7 +187,6 @@ public class ServerFrame extends TestAbstract<String>{
 						}else{
 							infoFrame.addLogLine(connection + " is trying to update unsupported component");
 						}
-
 					}
 				}
 			});
@@ -236,9 +240,11 @@ public class ServerFrame extends TestAbstract<String>{
 				try{
 					Entity newEntity = new Entity();
 					newEntity.add(new Name(scn.next()));
-					newEntity.add(new MapName((scn.next())));
+					String mapName = scn.next();
+					newEntity.add(new MapName(mapName));
 					Position position = new Position(scn.nextFloat(),scn.nextFloat());
 					newEntity.add(position);
+					newEntity.add(new Bounds(TILE_SIZE,TILE_SIZE));
 					if(scn.hasNext()) {
 						Target target = new Target(worldData.getEntityWithID(scn.nextLong()));
 						newEntity.add(target);
@@ -251,7 +257,7 @@ public class ServerFrame extends TestAbstract<String>{
 						System.out.println("New destination of "+newEntity.getComponent(Name.class).name+" is X:"+destination.x+" Y:"+destination.y);
 						newEntity.add(destination);
 					}
-					worldData.addEntity(newEntity);
+					worldData.addEntity(newEntity,mapName);
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("argument 3 and 4 need to be floats, argument 5 needs to be integer");
 				}catch(NoSuchElementException e){
@@ -273,12 +279,33 @@ public class ServerFrame extends TestAbstract<String>{
 						newEntity.add(nameComponent);
 						newEntity.add(mapNameComponent);
 						newEntity.add(positionComponent);
-						worldData.addEntity(newEntity);
+						newEntity.add(new Bounds(TILE_SIZE,TILE_SIZE));
+						//FIXME this will cause nullpointer when adding to a map that isn't loaded
+						worldData.addEntity(newEntity,mapName);
 					}
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("first argument needs to be an integer, second a String");
 				}catch(NoSuchElementException e){
 					infoFrame.addLogLine("addbulk command needs 1 or 2 arguments");
+				}
+			}else if(command.equals("move")){
+				commandParsed = true;
+				try{
+					long networkID = scn.nextLong();
+					int x = scn.nextInt();
+					int y = scn.nextInt();
+					Entity e = worldData.getEntityWithID(networkID);
+					infoFrame.addLogLine(Mappers.nameM.get(e).name+" is now moving to X:"+x+" Y:"+y);
+					if(Mappers.destinationM.get(e) != null){
+						Mappers.destinationM.get(e).x = x;
+						Mappers.destinationM.get(e).y = y;
+					}else{
+						e.add(new Destination(x,y));
+					}
+				}catch(InputMismatchException e){
+					infoFrame.addLogLine("arguments needs to be integers");
+				}catch(NoSuchElementException e){
+					infoFrame.addLogLine("move command needs 3 arguments");
 				}
 			}else if(command.equals("loadworld")){
 				commandParsed = true;
@@ -335,6 +362,10 @@ public class ServerFrame extends TestAbstract<String>{
 					continue;
 				}
 				if(component instanceof Destination){
+					//Don't send server only components
+					continue;
+				}
+				if(component instanceof Movement){
 					//Don't send server only components
 					continue;
 				}
@@ -396,7 +427,9 @@ public class ServerFrame extends TestAbstract<String>{
 			syncsSent++;
 			syncsSentPerSecondCounter++;
 		}
-		worldData.updateWorld(1);
+		//FIXME use delta time here instead of absolute 1 second
+		worldData.updateWorld(1,"untitled.tmx");
+		//worldData.updateAllWorlds(1);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -411,13 +444,36 @@ public class ServerFrame extends TestAbstract<String>{
 	private void loadWorld(String mapName){
 		clearEntities();
 		worldData = WorldLoader.loadWorld(mapName);
-		worldData.addSystem(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class,Destination.class).get()));
-		AIFollowEntitySystem aiFollowEntitySystem = new AIFollowEntitySystem(Family.all(Target.class).get());
-		worldData.addFamilyListener(Family.all(Target.class).get(), aiFollowEntitySystem);
-		worldData.addSystem(aiFollowEntitySystem);
-		AIMoveToDestinationSystem aiMoveToDestinationSystem = new AIMoveToDestinationSystem(Family.all(Destination.class).get());
-		worldData.addFamilyListener(Family.all(Destination.class).get(), aiMoveToDestinationSystem);
-		worldData.addSystem(aiMoveToDestinationSystem);
+
+		//FIXME If the same system is added to all engines it will be run once per engine while holding entities from all maps, if i want a shared system for all maps i should probably add a global engine
+
+		for(String map :worldData.getAllMapNames()){
+
+			worldData.addSystemToMap(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class, Destination.class, Player.class).get()), map);
+
+			AIFollowEntitySystem aiFollowEntitySystem = new AIFollowEntitySystem(Family.all(Target.class).get());
+			worldData.addFamilyListenerToEngine(Family.all(Target.class).get(), aiFollowEntitySystem, map);
+			worldData.addSystemToMap(aiFollowEntitySystem, map);
+
+			AIMoveToDestinationSystem aiMoveToDestinationSystem = new AIMoveToDestinationSystem(Family.all(Destination.class).get());
+			worldData.addFamilyListenerToEngine(Family.all(Destination.class).get(), aiMoveToDestinationSystem, map);
+			worldData.addSystemToMap(aiMoveToDestinationSystem, map);
+
+			MapCollisionSystem mapCollisionSystem = new MapCollisionSystem(Family.all(Movement.class).exclude(Player.class).get(), worldData, map);
+			worldData.addFamilyListenerToEngine(Family.all(Movement.class).exclude(Player.class).get(),mapCollisionSystem,map);
+			worldData.addSystemToMap(mapCollisionSystem, map);
+
+			MapObjectCollisionSystem mapObjectCollisionSystem = new MapObjectCollisionSystem(Family.all(Movement.class).exclude(Player.class).get(), worldData, map);
+			worldData.addFamilyListenerToEngine(Family.all(Movement.class).exclude(Player.class).get(),mapObjectCollisionSystem,map);
+			worldData.addSystemToMap(mapObjectCollisionSystem, map);
+
+			EntityCollisionSystem entityCollisionSystem = new EntityCollisionSystem(Family.all(Movement.class).exclude(Player.class).get(),worldData,map);
+			worldData.addFamilyListenerToEngine(Family.all(Movement.class).get(), entityCollisionSystem,map);
+			worldData.addSystemToMap(entityCollisionSystem,map);
+
+			MovementApplyingSystem movementApplyingSystem = new MovementApplyingSystem(Family.all(Movement.class).get());
+			worldData.addSystemToMap(movementApplyingSystem,map);
+		}
 	}
 
 	@Override

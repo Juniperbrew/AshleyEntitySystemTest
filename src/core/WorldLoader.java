@@ -22,7 +22,6 @@ public class WorldLoader {
 		String resFolderPath = (System.getProperty("user.dir") + File.separator + "res" + File.separator);
 
 		HashMap<String,Map> allMaps = new HashMap<>();
-		WorldData worldData = new WorldData(new Engine(), allMaps);
 
 		System.out.println("#Loading world from: " + resFolderPath);
 		System.out.println("#Loading mainmap: " + startingMapName);
@@ -37,11 +36,11 @@ public class WorldLoader {
 			}
 		}
 
+		WorldData worldData = new WorldData(allMaps);
 		for(String mapName : allMaps.keySet()){
 			loadObjects(worldData, mapName);
 		}
 		worldData.printEntities();
-		worldData.allMaps = allMaps;
 		return worldData;
 	}
 	

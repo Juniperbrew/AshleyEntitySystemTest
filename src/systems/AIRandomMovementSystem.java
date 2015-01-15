@@ -4,6 +4,7 @@ package systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import components.server.Movement;
 import components.shared.Position;
 import core.Mappers;
 
@@ -26,11 +27,12 @@ public class AIRandomMovementSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Position position = Mappers.positionM.get(entity);
+        Movement movement = Mappers.movementM.get(entity);
 
-        //Dont move players
-        if(Mappers.playerM.get(entity) == null) {
-            position.x += ((rng.nextFloat() * 5) - 2.5f) * deltaTime;
-            position.y += ((rng.nextFloat() * 5) - 2.5f) * deltaTime;
+        if(Mappers.targetM.get(entity) != null){
+            System.out.println("Randomly moving " +Mappers.nameM.get(entity).name);
         }
+        movement.deltaX = ((rng.nextFloat() * 5) - 2.5f) * deltaTime;
+        movement.deltaY = ((rng.nextFloat() * 5) - 2.5f) * deltaTime;
     }
 }
