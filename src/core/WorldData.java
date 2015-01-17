@@ -1,8 +1,8 @@
 package core;
 
 import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.maps.MapObjects;
 import components.server.Destination;
 import components.server.Movement;
 import components.server.Target;
@@ -21,6 +21,9 @@ public class WorldData implements EntityListener {
     public HashMap<Long,Entity> entityIDs;
     public HashMap<String,Vector<Entity>> entitiesInMaps;
     private HashMap<String,Engine> allEngines;
+    private HashMap<String,LinkedList<MapObject>> objectsInMaps;
+
+    private HashMap<Long,String> tempTargetStorage;
 
     private long networkIDCounter;
 
@@ -34,6 +37,11 @@ public class WorldData implements EntityListener {
         this.allMaps = allMaps;
         entitiesInMaps = new HashMap<>();
         entityIDs = new HashMap<>();
+        objectsInMaps = new HashMap<>();
+        tempTargetStorage = new HashMap<>();
+        for(String mapName:allMaps.keySet()){
+            objectsInMaps.put(mapName, loadObjectsFromMap(mapName));
+        }
     }
 
     public boolean hasMap(String mapName){
@@ -60,12 +68,6 @@ public class WorldData implements EntityListener {
         return new MapMask(height,width,layers,property);
     }
 
-    public void addSystemToAllMaps(EntitySystem system){
-        for(Engine engine : allEngines.values()){
-            engine.addSystem(system);
-        }
-    }
-
     public void toggleAllSystemsOnMap(String mapName, boolean enabled){
         for(EntitySystem system:allEngines.get(mapName).getSystems()){
             system.setProcessing(enabled);
@@ -84,6 +86,10 @@ public class WorldData implements EntityListener {
     }
 
     public LinkedList<MapObject> getObjectsFromMap(String mapName){
+        return objectsInMaps.get(mapName);
+    }
+
+    private LinkedList<MapObject> loadObjectsFromMap(String mapName){
 
         ObjectGroup objectLayer = null;
 
@@ -199,84 +205,69 @@ public class WorldData implements EntityListener {
         }
     }
 
-    public void updateEntitiesInMap(HashMap<Long,Component[]> updatedEntities, String mapName){
-        System.out.println("Updating map:"+mapName);
-
-        Set<Long> updateIDList = updatedEntities.keySet();
-
-        //Loop through all entities sent in update
-        for(long id : updateIDList){
-            //The changed local entity
-            Entity e = getEntityWithID(id);
-            //Get the new components
-            Component[] updatedComponents = updatedEntities.get(id);
-            if(e == null) {
-                //If the entity doesnt exist in local store we add it
-                Entity newEntity = new Entity();
-                //Add new components
-                for(Component updatedComponent : updatedComponents){
-                    newEntity.add(updatedComponent);
-                }
-                addEntity(newEntity, mapName);
-            }else{
-                //remove all components
-                e.removeAll();
-                //Add new components
-                for(Component updatedComponent : updatedComponents){
-                    e.add(updatedComponent);
+    public void assignTargets(){
+        if(tempTargetStorage != null){
+            for(long id:tempTargetStorage.keySet()){
+                Entity entity = entityIDs.get(id);
+                String target = tempTargetStorage.get(id);
+                for(Entity e:entityIDs.values()){
+                    if(Mappers.nameM.get(e).name.equals(target)){
+                        entity.add(new Target(e));
+                        System.out.println(Mappers.nameM.get(entity).name+" target is now "+Mappers.nameM.get(e).name);
+                    }
                 }
             }
         }
-
-        //Remove all entities not sent in update
-        //Copy id list to avoid ConcurrentModificationException caused by calls to entityRemoved(Entity e)
-        //FIXME is this a good idea
-        Vector<Long> idListCopy = new Vector<>();
-        for(long id : entityIDs.keySet()){
-            idListCopy.add(id);
-        }
-
-        for(long id : idListCopy){
-            if (updateIDList.contains(id)) {
-                //This entity was sent in update
-            } else {
-                //We dont need to remove ID here since it's removed in the call to listeners entityRemoved()
-                //iter.remove();
-                allEngines.get(mapName).removeEntity(getEntityWithID(id));
-
-                System.out.println("Removed one entity from local list, this should never happen on server");
-            }
-        }
+        tempTargetStorage = null;
     }
 
-    protected void createEntity(String mapName, MapObject obj, int mapHeightPixels){
-        Entity newEntity = new Entity();
-        Tile tile = obj.getTile();
-        if(tile != null){
-            int tileID = obj.getTile().getId();
-            newEntity.add(new TileID(tileID));
-            newEntity.add(new Bounds(Global.TILE_SIZE, Global.TILE_SIZE));
-            System.out.println("Name: " + obj.getName() + " Type: " + obj.getType() + " TileID: " + tileID);
-        }else{
-            System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
-            newEntity.add(new Bounds(obj.getWidth(),obj.getHeight()));
+    protected void createEntitiesFromObjects(){
+        for(String mapName:objectsInMaps.keySet()){
+            LinkedList<MapObject> objects = objectsInMaps.get(mapName);
+            for(MapObject obj:objects){
+                if(obj.getType().equalsIgnoreCase("entity")) {
+                    Entity newEntity = new Entity();
+                    long networkID = getNextNetworkID();
+                    newEntity.add(new NetworkID(networkID));
+                    Tile tile = obj.getTile();
+                    if (tile != null) {
+                        int tileID = obj.getTile().getId();
+                        newEntity.add(new TileID(tileID));
+                        newEntity.add(new Bounds(Global.TILE_SIZE, Global.TILE_SIZE));
+                        System.out.println("Name: " + obj.getName() + " Type: " + obj.getType() + " TileID: " + tileID);
+                    } else {
+                        System.out.println("Name: " + obj.getName() + " Type: " + obj.getType());
+                        newEntity.add(new Bounds(obj.getWidth(), obj.getHeight()));
+                    }
+
+                    Properties entityProperties = obj.getProperties();
+                    entityProperties.list(System.out);
+                    System.out.println();
+
+                    newEntity.add(new Name(obj.getName()));
+                    newEntity.add(new MapName(mapName));
+                    newEntity.add(new Position(obj.getX(), obj.getY()));
+
+                    if (entityProperties.getProperty("AI") != null) {
+                        String ai = entityProperties.getProperty("AI");
+                        if (ai.equals("move")) {
+                            newEntity.add(new Destination(obj.getX(), obj.getY()));
+                        } else if (ai.equals("follow")) {
+                            String target = entityProperties.getProperty("target");
+                            if (target != null) {
+                                tempTargetStorage.put(networkID, target);
+                            }
+                        }
+                    }
+
+                    if (entityProperties.containsKey("health")) {
+                        int health = Integer.parseInt(entityProperties.getProperty("health"));
+                        newEntity.add(new Health(health));
+                    }
+                    addEntity(newEntity, mapName);
+                }
+            }
         }
-
-        Properties entityProperties = obj.getProperties();
-        entityProperties.list(System.out);
-        System.out.println();
-
-        newEntity.add(new Name(obj.getName()));
-        newEntity.add(new MapName(mapName));
-        //Y axis needs to be inverted because tiled map editor has origo in top left
-        newEntity.add(new Position(obj.getX(), mapHeightPixels-obj.getY()-obj.getHeight()));
-        newEntity.add(new Destination(obj.getX(), mapHeightPixels-obj.getY()-obj.getHeight()));
-
-        if(entityProperties.containsKey("health")){
-            int health = Integer.parseInt(entityProperties.getProperty("health"));
-            newEntity.add(new Health(health));
-        }
-        addEntity(newEntity, mapName);
     }
 
     public long getNextNetworkID(){
@@ -324,22 +315,11 @@ public class WorldData implements EntityListener {
         }
     }
 
-    public void addFamilyListenerToAllEngines(Family family, EntityListener listener){
-        for(Engine engine:allEngines.values()) {
-            engine.addEntityListener(family, listener);
-        }
-    }
-
     public void addFamilyListenerToEngine(Family family, EntityListener listener, String mapName){
         allEngines.get(mapName).addEntityListener(family,listener);
     }
 
     public void dumpData(){
-
-        /*
-        public HashMap<String,Map> allMaps;
-        public HashMap<Long,Entity> entityIDs;
-        private long networkIDCounter;*/
 
         System.out.println("-----------------------------------------");
         for(String mapName : allEngines.keySet()){

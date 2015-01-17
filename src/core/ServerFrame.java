@@ -1,7 +1,6 @@
 package core;
 
-import java.awt.Toolkit;
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 
@@ -24,6 +23,7 @@ import network.Network.Spawn;
 import network.Network.GoToMap;
 import network.Network.*;
 import systems.*;
+import tiled.core.MapObject;
 
 import javax.swing.*;
 
@@ -42,6 +42,8 @@ public class ServerFrame extends TestAbstract<String>{
 	final int objectBufferSize = 4096; //default 2048
 
 	final int TILE_SIZE = 32;
+
+	HashMap<Connection,Long> blocksSyncsFromConnection;
 
 	//##GAME DATA
 	WorldData worldData;
@@ -103,18 +105,20 @@ public class ServerFrame extends TestAbstract<String>{
 						String senderName = getPlayerName(connection);
 
 						if(message.text.equalsIgnoreCase("ping")){
-							message.text = "SERVER: Pong";
+							message.text = "Pong";
+							message.senderName = "SERVER";
 							connection.sendTCP(message);
 							infoFrame.addLogLine("Sent pong to " + senderName);
 						}else if(message.text.equalsIgnoreCase("sync")){
 							sync(connection);
-							message.text = "SERVER: entities synced";
+							message.text = "entities synced";
+							message.senderName = "SERVER";
 							connection.sendTCP(message);
 							infoFrame.addLogLine("Sent server status to " + senderName);
 						}else{
-							//Normal chat message
+							//Normal chat message we add the sender name to packet and send it to all clients
 							infoFrame.addLogLine(senderName + ": " + message.text);
-							message.text = senderName + ": " + message.text;
+							message.senderName = senderName;
 							server.sendToAllTCP(message);
 						}
 					}else if (object instanceof Spawn) {
@@ -122,15 +126,26 @@ public class ServerFrame extends TestAbstract<String>{
 						if(!worldData.hasMap(spawn.mapName)){
 							infoFrame.addLogLine(connection+" tried to spawn in non existing map:"+spawn.mapName);
 							Message message = new Message();
-							message.text = ("SERVER: Map "+spawn.mapName+" does not exist on server");
+							message.text = ("Map "+spawn.mapName+" does not exist on server");
+							message.senderName = "SERVER";
 							connection.sendTCP(message);
 							return;
 						}else{
 							infoFrame.addLogLine("Spawning player " + spawn.name + " in " + spawn.mapName);
 						}
+						int playerWidth = 16;
+						int playerHeight = 32;
 						//We ignore the coordinates the client sent and make up our own
 						int x = 322;
 						int y = 322;
+						for(MapObject obj :worldData.getObjectsFromMap(spawn.mapName)){
+							//If we find a spawn in map we give those coordinates
+							if(obj.getType().equals("Spawn")){
+								Rectangle spawnRect = obj.getBounds();
+								x = spawnRect.x+spawnRect.width/2-playerWidth/2;
+								y = spawnRect.y+spawnRect.height/2-playerHeight/2;
+							}
+						}
 						long networkID = worldData.getNextNetworkID();
 
 						Entity newPlayer = new Entity();
@@ -138,7 +153,7 @@ public class ServerFrame extends TestAbstract<String>{
 						newPlayer.add(new Name(spawn.name));
 						newPlayer.add(new MapName(spawn.mapName));
 						newPlayer.add(new Position(x,y));
-						newPlayer.add(new Bounds(16,32));
+						newPlayer.add(new Bounds(playerWidth,playerHeight));
 						newPlayer.add(new Player());
 						worldData.addEntity(newPlayer, spawn.mapName);
 
@@ -158,8 +173,27 @@ public class ServerFrame extends TestAbstract<String>{
 							return;
 						}
 						MapName mapComponent = Mappers.mapM.get(player);
+						Position pos = Mappers.positionM.get(player);
+						Bounds bounds = Mappers.boundsM.get(player);
 
-						infoFrame.addLogLine("Moving player " + Mappers.nameM.get(player).name + " to " + goToMap.mapName);
+						infoFrame.addLogLine("Searching for destination:"+goToMap.destinationObject);
+
+						if(goToMap.destinationObject != null){
+							for(MapObject obj : worldData.getObjectsFromMap(goToMap.mapName)){
+								if(obj.getName().equals(goToMap.destinationObject)){
+									//FIXME Block player for 0,5 sec from updating server when changing map, really need a better alternative
+									blocksSyncsFromConnection.put(connection, 500000000l);
+									infoFrame.addLogLine("Found:"+goToMap.destinationObject+"("+obj.getX()+","+obj.getY()+") in map "+goToMap.mapName);
+									pos.x = (int) (obj.getX() + obj.getWidth() / 2 - bounds.width / 2);
+									pos.y = (int) (obj.getY() + obj.getHeight() / 2 - bounds.height / 2);
+									goToMap.x = (int)pos.x;
+									goToMap.y = (int)pos.y;
+								}
+							}
+						}
+
+						infoFrame.addLogLine("Moving player " + Mappers.nameM.get(player).name + " to " + goToMap.mapName+"("+pos.x+","+pos.y+")");
+
 
 						//First remove player from old map
 						worldData.entitiesInMaps.get(mapComponent.map).remove(player);
@@ -184,6 +218,10 @@ public class ServerFrame extends TestAbstract<String>{
 						infoFrame.addLogLine("Received UpdateEntity, not handling.");
 					}
 					else if (object instanceof UpdateComponent) {
+						if(blocksSyncsFromConnection.containsKey(connection)){
+							infoFrame.addLogLine("Blocking syncs from "+connection+", "+blocksSyncsFromConnection.get(connection)+"nano left");
+							return;
+						}
 						UpdateComponent updateComponent = (UpdateComponent) object;
 						Entity entity = worldData.getEntityWithID(updateComponent.networkID);
 						Component updatedComponent = updateComponent.component;
@@ -223,7 +261,8 @@ public class ServerFrame extends TestAbstract<String>{
 		//If input is not a command we send it as a message to all clients
 		if(input.charAt(0) != '!'){
 			Message message = new Message();
-			message.text = "SERVER: " + input;
+			message.text = input;
+			message.senderName = "SERVER";
 			infoFrame.addInfoLine("Sent message: " + message.text);
 			infoFrame.addLogLine(message.text);
 			server.sendToAllTCP(message);
@@ -364,7 +403,8 @@ public class ServerFrame extends TestAbstract<String>{
 					pos.y = y;
 
 					Message message = new Message();
-					message.text = ("SERVER: Teleporting "+Mappers.nameM.get(e).name+" to X:"+x+" Y:"+y);
+					message.text = ("Teleporting "+Mappers.nameM.get(e).name+" to X:"+x+" Y:"+y);
+					message.senderName = "SERVER";
 					infoFrame.addLogLine("Teleporting "+Mappers.nameM.get(e).name+" to X:"+x+" Y:"+y);
 					server.sendToAllTCP(message);
 
@@ -378,12 +418,9 @@ public class ServerFrame extends TestAbstract<String>{
 				try{
 					String mapName = scn.next();
 					loadWorld(mapName);
-					//Despawn all clients
-					Spawn despawn = new Spawn();
-					despawn.networkID = -1;
-					server.sendToAllTCP(despawn);
 					Message message = new Message();
-					message.text = "SERVER: Loaded a new world "+mapName+" all clients have been despawned";
+					message.text = "Loaded a new world "+mapName;
+					message.senderName = "SERVER";
 					server.sendToAllTCP(message);
 				}catch(InputMismatchException e){
 					infoFrame.addLogLine("argument needs to be a String");
@@ -412,6 +449,11 @@ public class ServerFrame extends TestAbstract<String>{
 		Spawn despawn = new Spawn();
 		despawn.networkID = -1;
 		server.sendToAllTCP(despawn);
+
+		Message message = new Message();
+		message.text = "Cleared all entities and despawned players";
+		message.senderName = "SERVER";
+		server.sendToAllTCP(message);
 
 		infoFrame.addLogLine("Entities cleared");
 	}
@@ -506,6 +548,15 @@ public class ServerFrame extends TestAbstract<String>{
 			syncsSent++;
 			syncsSentPerSecondCounter++;
 		}
+		for(Connection connection:blocksSyncsFromConnection.keySet()){
+			long duration = blocksSyncsFromConnection.get(connection);
+			duration -= getDelta();
+			if(duration < 0){
+				blocksSyncsFromConnection.remove(connection);
+			}else{
+				blocksSyncsFromConnection.put(connection,duration);
+			}
+		}
 		long syncDuration = System.nanoTime()-tickStartTime;
 		syncDurationCounter += syncDuration;
 
@@ -530,7 +581,7 @@ public class ServerFrame extends TestAbstract<String>{
 
 		for(String map :worldData.getAllMapNames()){
 
-			//worldData.addSystemToMap(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class, Destination.class, Player.class).get()), map);
+			worldData.addSystemToMap(new AIRandomMovementSystem(Family.all(Position.class).exclude(Target.class, Destination.class, Player.class).get()), map);
 
 			AIFollowEntitySystem aiFollowEntitySystem = new AIFollowEntitySystem(Family.all(Target.class).get());
 			worldData.addFamilyListenerToEngine(Family.all(Target.class).get(), aiFollowEntitySystem, map);
@@ -563,6 +614,7 @@ public class ServerFrame extends TestAbstract<String>{
 	protected void initialize() {
 		startServer();
 		playerList = new HashMap<>();
+		blocksSyncsFromConnection = new HashMap<>();
 		loadWorld("untitled.tmx");
 	}
 

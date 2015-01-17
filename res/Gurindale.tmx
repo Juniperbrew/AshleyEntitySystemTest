@@ -187,7 +187,7 @@
     <property name="destination" value="Cave2"/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="0" y="584" width="593" height="57">
+  <object name="Collision" type="Collision" x="0" y="584" width="593" height="57">
    <properties>
     <property name="blocked" value=""/>
    </properties>
@@ -197,272 +197,272 @@
     <property name="destination" value="Cave1"/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="549" y="439" width="199" height="53">
+  <object name="Collision" type="Collision" x="549" y="439" width="199" height="53">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="338" y="440" width="135" height="58">
+  <object name="Collision" type="Collision" x="338" y="440" width="135" height="58">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="339" y="402" width="411" height="28">
+  <object name="Collision" type="Collision" x="339" y="402" width="411" height="28">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="681" y="586" width="138" height="56">
+  <object name="Collision" type="Collision" x="681" y="586" width="138" height="56">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="767" y="292" width="49" height="289">
+  <object name="Collision" type="Collision" x="767" y="292" width="49" height="289">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="821" y="294" width="503" height="56">
+  <object name="Collision" type="Collision" x="821" y="294" width="503" height="56">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1274" y="2" width="49" height="289">
+  <object name="Collision" type="Collision" x="1274" y="2" width="49" height="289">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="701" y="184" width="47" height="230">
+  <object name="Collision" type="Collision" x="701" y="184" width="47" height="230">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="340" y="183" width="47" height="231">
+  <object name="Collision" type="Collision" x="340" y="183" width="47" height="231">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="391" y="181" width="307" height="24">
+  <object name="Collision" type="Collision" x="391" y="181" width="307" height="24">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="0" y="571" width="762" height="7">
+  <object name="Collision" type="Collision" x="0" y="571" width="762" height="7">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1" y="3" width="4" height="560">
+  <object name="Collision" type="Collision" x="1" y="3" width="4" height="560">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1" y="644" width="3" height="2553">
+  <object name="Collision" type="Collision" x="1" y="644" width="3" height="2553">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="3193" y="6" width="5" height="3191">
+  <object name="Collision" type="Collision" x="3193" y="6" width="5" height="3191">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="8" y="1" width="3193" height="4">
+  <object name="Collision" type="Collision" x="8" y="1" width="3193" height="4">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="3" y="3192" width="3193" height="4">
+  <object name="Collision" type="Collision" x="3" y="3192" width="3193" height="4">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2188" y="1151" width="160" height="57">
+  <object name="Collision" type="Collision" x="2188" y="1151" width="160" height="57">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2574" y="1154" width="160" height="57">
+  <object name="Collision" type="Collision" x="2574" y="1154" width="160" height="57">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2194" y="609" width="21" height="539">
+  <object name="Collision" type="Collision" x="2194" y="609" width="21" height="539">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2707" y="607" width="23" height="546">
+  <object name="Collision" type="Collision" x="2707" y="607" width="23" height="546">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2579" y="798" width="18" height="353">
+  <object name="Collision" type="Collision" x="2579" y="798" width="18" height="353">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2328" y="796" width="18" height="353">
+  <object name="Collision" type="Collision" x="2328" y="796" width="18" height="353">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2374" y="735" width="182" height="60">
+  <object name="Collision" type="Collision" x="2374" y="735" width="182" height="60">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2350" y="767" width="19" height="57">
+  <object name="Collision" type="Collision" x="2350" y="767" width="19" height="57">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2558" y="769" width="19" height="57">
+  <object name="Collision" type="Collision" x="2558" y="769" width="19" height="57">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2220" y="596" width="484" height="33">
+  <object name="Collision" type="Collision" x="2220" y="596" width="484" height="33">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2446" y="877" width="38" height="48">
+  <object name="Collision" type="Collision" x="2446" y="877" width="38" height="48">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="94" y="742" width="36" height="26">
+  <object name="Collision" type="Collision" x="94" y="742" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="256" y="774" width="36" height="26">
+  <object name="Collision" type="Collision" x="256" y="774" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="160" y="936" width="36" height="26">
+  <object name="Collision" type="Collision" x="160" y="936" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="159" y="1096" width="36" height="26">
+  <object name="Collision" type="Collision" x="159" y="1096" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="318" y="1160" width="36" height="26">
+  <object name="Collision" type="Collision" x="318" y="1160" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="444" y="777" width="36" height="26">
+  <object name="Collision" type="Collision" x="444" y="777" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="672" y="806" width="36" height="26">
+  <object name="Collision" type="Collision" x="672" y="806" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="545" y="1128" width="36" height="26">
+  <object name="Collision" type="Collision" x="545" y="1128" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="768" y="1064" width="36" height="26">
+  <object name="Collision" type="Collision" x="768" y="1064" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="893" y="1159" width="36" height="26">
+  <object name="Collision" type="Collision" x="893" y="1159" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="863" y="903" width="36" height="26">
+  <object name="Collision" type="Collision" x="863" y="903" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="833" y="777" width="36" height="26">
+  <object name="Collision" type="Collision" x="833" y="777" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1088" y="1122" width="36" height="26">
+  <object name="Collision" type="Collision" x="1088" y="1122" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1024" y="935" width="36" height="26">
+  <object name="Collision" type="Collision" x="1024" y="935" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1055" y="742" width="36" height="26">
+  <object name="Collision" type="Collision" x="1055" y="742" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="957" y="648" width="36" height="26">
+  <object name="Collision" type="Collision" x="957" y="648" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="959" y="486" width="36" height="26">
+  <object name="Collision" type="Collision" x="959" y="486" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1087" y="548" width="36" height="26">
+  <object name="Collision" type="Collision" x="1087" y="548" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1214" y="488" width="36" height="26">
+  <object name="Collision" type="Collision" x="1214" y="488" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1183" y="649" width="36" height="26">
+  <object name="Collision" type="Collision" x="1183" y="649" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1181" y="839" width="36" height="26">
+  <object name="Collision" type="Collision" x="1181" y="839" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1312" y="677" width="36" height="26">
+  <object name="Collision" type="Collision" x="1312" y="677" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1312" y="934" width="36" height="26">
+  <object name="Collision" type="Collision" x="1312" y="934" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1409" y="1257" width="36" height="26">
+  <object name="Collision" type="Collision" x="1409" y="1257" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1856" y="1127" width="36" height="26">
+  <object name="Collision" type="Collision" x="1856" y="1127" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2620" y="1514" width="36" height="26">
+  <object name="Collision" type="Collision" x="2620" y="1514" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2400" y="1767" width="36" height="26">
+  <object name="Collision" type="Collision" x="2400" y="1767" width="36" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
@@ -487,132 +487,132 @@
     <property name="destination" value="Cave5"/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="303" y="3012" width="455" height="57">
+  <object name="Collision" type="Collision" x="303" y="3012" width="455" height="57">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="976" y="2858" width="193" height="52">
+  <object name="Collision" type="Collision" x="976" y="2858" width="193" height="52">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1261" y="2857" width="169" height="54">
+  <object name="Collision" type="Collision" x="1261" y="2857" width="169" height="54">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="303" y="2446" width="1111" height="26">
+  <object name="Collision" type="Collision" x="303" y="2446" width="1111" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="303" y="2473" width="24" height="538">
+  <object name="Collision" type="Collision" x="303" y="2473" width="24" height="538">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1398" y="2472" width="29" height="383">
+  <object name="Collision" type="Collision" x="1398" y="2472" width="29" height="383">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="729" y="2627" width="29" height="383">
+  <object name="Collision" type="Collision" x="729" y="2627" width="29" height="383">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="759" y="2629" width="215" height="54">
+  <object name="Collision" type="Collision" x="759" y="2629" width="215" height="54">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="976" y="2627" width="29" height="231">
+  <object name="Collision" type="Collision" x="976" y="2627" width="29" height="231">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2284" y="2824" width="360" height="54">
+  <object name="Collision" type="Collision" x="2284" y="2824" width="360" height="54">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2310" y="2481" width="316" height="27">
+  <object name="Collision" type="Collision" x="2310" y="2481" width="316" height="27">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2287" y="2497" width="29" height="329">
+  <object name="Collision" type="Collision" x="2287" y="2497" width="29" height="329">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2617" y="2495" width="29" height="329">
+  <object name="Collision" type="Collision" x="2617" y="2495" width="29" height="329">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1195" y="2510" width="35" height="209">
+  <object name="Collision" type="Collision" x="1195" y="2510" width="35" height="209">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1331" y="2511" width="35" height="209">
+  <object name="Collision" type="Collision" x="1331" y="2511" width="35" height="209">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="362" y="2607" width="35" height="209">
+  <object name="Collision" type="Collision" x="362" y="2607" width="35" height="209">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="503" y="2605" width="60" height="210">
+  <object name="Collision" type="Collision" x="503" y="2605" width="60" height="210">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="398" y="2603" width="129" height="26">
+  <object name="Collision" type="Collision" x="398" y="2603" width="129" height="26">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1232" y="2510" width="99" height="27">
+  <object name="Collision" type="Collision" x="1232" y="2510" width="99" height="27">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2380" y="2553" width="35" height="163">
+  <object name="Collision" type="Collision" x="2380" y="2553" width="35" height="163">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2517" y="2554" width="35" height="163">
+  <object name="Collision" type="Collision" x="2517" y="2554" width="35" height="163">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2420" y="2542" width="92" height="28">
+  <object name="Collision" type="Collision" x="2420" y="2542" width="92" height="28">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="397" y="2731" width="103" height="8">
+  <object name="Collision" type="Collision" x="397" y="2731" width="103" height="8">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1231" y="2636" width="100" height="8">
+  <object name="Collision" type="Collision" x="1231" y="2636" width="100" height="8">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="2413" y="2635" width="100" height="8">
+  <object name="Collision" type="Collision" x="2413" y="2635" width="100" height="8">
    <properties>
     <property name="blocked" value=""/>
    </properties>
   </object>
-  <object name="Collission" type="Collission" x="1006" y="2833" width="390" height="6">
+  <object name="Collision" type="Collision" x="1006" y="2833" width="390" height="6">
    <properties>
     <property name="blocked" value=""/>
    </properties>

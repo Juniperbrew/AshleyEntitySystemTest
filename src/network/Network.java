@@ -52,6 +52,8 @@ public class Network {
 
 	static public class Message{
 		public String text;
+		public String senderName;
+		public long networkID;
 	}
 
 	static public class UpdateEntity{
@@ -75,6 +77,9 @@ public class Network {
 
 	static public class GoToMap{
 		public String mapName;
+		public int x;
+		public int y;
+		public String destinationObject;
 	}
 
 	static public class Spawn{

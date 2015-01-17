@@ -152,7 +152,6 @@ public class ClientFrame extends TestAbstract<String>{
 	@Override
 	protected void initialize() {
 		startClient();
-		worldData = new WorldData(null);
 	}
 
 	public static void main(String[] args){
